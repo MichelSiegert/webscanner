@@ -48,7 +48,7 @@ export class MapComponent implements AfterViewInit {
 
   ngAfterViewInit(): void { 
     this.initMap();
-    this.marker.makeCapitalMarkers(this.map!);
+    this.marker.makeCapitalMarkersCircle(this.map!);
 
   }
 
