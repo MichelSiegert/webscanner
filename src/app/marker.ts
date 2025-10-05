@@ -6,7 +6,7 @@ import * as L from 'leaflet';
 @Injectable({
   providedIn: 'root'
 })
-export class Marker {
+export class MarkerService {
   capitals: string = '/assets/data/usa-capitals.geojson';
   
 
@@ -35,7 +35,7 @@ export class Marker {
       for (const c of res.features) {
         const lon = c.geometry.coordinates[0];
         const lat = c.geometry.coordinates[1];
-        const marker = L.circleMarker([lat, lon], { radius: Marker.scaledRadius(c.properties.population, maxPop)
+        const marker = L.circleMarker([lat, lon], { radius: MarkerService.scaledRadius(c.properties.population, maxPop)
          });
         marker.addTo(map);
       }

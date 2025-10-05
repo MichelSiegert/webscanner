@@ -1,6 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
-import { Marker } from '../marker';
+import { MarkerService } from '../marker';
 import { BranchService } from '../branch-service';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
@@ -44,9 +44,15 @@ export class MapComponent implements AfterViewInit {
     });
     
     tiles.addTo(this.map);
+
+    this.map.on('click', (e) => {
+      const marker = L.marker(e.latlng);
+      marker
+      marker.addTo(this.map!);
+});
   }
 
-  constructor(private marker : Marker, private branchService: BranchService) {  }
+  constructor(private marker : MarkerService, private branchService: BranchService) {  }
 
   ngAfterViewInit(): void { 
     this.initMap();
