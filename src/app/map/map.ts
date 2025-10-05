@@ -2,6 +2,8 @@ import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
 import { MarkerService } from '../marker';
 import { BranchService } from '../branch-service';
+import { JsonReaderService } from '../json-reader';
+import { overpassService } from '../overpass-service';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -45,14 +47,19 @@ export class MapComponent implements AfterViewInit {
     
     tiles.addTo(this.map);
 
-    this.map.on('click', (e) => {
-      const marker = L.marker(e.latlng);
-      marker
-      marker.addTo(this.map!);
+    this.map.on('click', async (e) => {
+    this.handwerkerService.getNearbyHandwerker(e.latlng.lat, e.latlng.lng)
+    .subscribe((places: any)=>{
+      places.elements.forEach((place: any)=>{
+        this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
+        const marker = L.marker({lat:place.lat,  lng:place.lon});
+        marker.addTo(this.map!);
+       });
+      });
 });
   }
 
-  constructor(private marker : MarkerService, private branchService: BranchService) {  }
+  constructor(private marker : MarkerService, private branchService: BranchService, private jsonReader: JsonReaderService, private handwerkerService : overpassService) {  }
 
   ngAfterViewInit(): void { 
     this.initMap();
