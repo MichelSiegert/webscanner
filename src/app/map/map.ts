@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
 import { Marker } from '../marker';
+import { BranchService } from '../branch-service';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -24,6 +25,7 @@ L.Marker.prototype.options.icon = iconDefault;
   styleUrls: ['./map.css']
 })
 export class MapComponent implements AfterViewInit {
+  currrentbranch: string = "";
 
 
   
@@ -44,12 +46,16 @@ export class MapComponent implements AfterViewInit {
     tiles.addTo(this.map);
   }
 
-  constructor(private marker : Marker) {  }
+  constructor(private marker : Marker, private branchService: BranchService) {  }
 
   ngAfterViewInit(): void { 
     this.initMap();
     this.marker.makeCapitalMarkersCircle(this.map!);
 
+    this.branchService.currentBranch.subscribe((newBranch :string)=>{
+      this.currrentbranch = newBranch;
+    });
   }
+
 
 }

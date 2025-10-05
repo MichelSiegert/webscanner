@@ -1,0 +1,7 @@
+.json-tree-container {
+  max-height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+.mat-tree-node {
+  padding: 0.25rem 0.5rem;
+}
