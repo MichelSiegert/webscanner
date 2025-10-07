@@ -23,7 +23,6 @@ export class JsonReaderService {
   addToTreeFromJSON(json: any){
     const tmp = this.dataSource.value;
     tmp.push(this.jsonToTree(json, `${json.latlng.lat}, ${json.latlng.lng}`));
-    console.log(this.jsonToTree(json));
     this.dataSource.next(tmp);
   }
 
@@ -31,9 +30,7 @@ export class JsonReaderService {
   addLocaleToJson(json: any, name: string, maxDepth: number){
     const tmp = this.dataSource.value;
     const newEntry = this.jsonToTree(json,name,0,  maxDepth);
-    console.log(tmp);
     if(!tmp.map((e)=>e.name).includes(newEntry.name)) tmp.push(newEntry);
-    console.log(tmp);
     this.dataSource.next(tmp);
   }
 

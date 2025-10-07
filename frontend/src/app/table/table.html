@@ -1,0 +1,42 @@
+<div class="mx-auto mt-6 bg-white shadow-lg rounded-lg max-h-6/12 overflow-auto">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Website</th>
+        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <tr *ngFor="let entry of entries">
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.name.trim() || '-' }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.email.trim() || '-' }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.city.trim() || '-' }}</td>
+        <td>
+          <ng-container *ngIf="entry.website; else noLinks">
+            <span *ngFor="let link of entry.website.split(', ')">
+              <a [href]="link" target="_blank" class="text-blue-600 hover:underline">{{ link }}</a><br>
+            </span>
+          </ng-container>
+          <ng-template #noLinks>-</ng-template>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+          <button 
+            (click)="triggerAction(entry)" 
+            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded mr-5"
+          >
+            Web Analyse
+          </button>
+          <button 
+            (click)="triggerAction(entry)" 
+            class="bg-white hover:bg-blue-300 text-blue-600 border-blue-500 font-semibold py-1 px-3 rounded"
+          >
+            Email senden
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

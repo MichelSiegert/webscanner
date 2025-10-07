@@ -7,8 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { BranchInput } from './branch-input/branch-input';
 import { JsonDisplayer } from './json-displayer/json-displayer';
-import { MatIcon } from '@angular/material/icon';
-import { MatIconButton } from '@angular/material/button';
+import { Table } from './table/table';
 
 @Component({
   selector: 'app-root',
@@ -16,11 +15,10 @@ import { MatIconButton } from '@angular/material/button';
     MatSlideToggleModule,
     MatFormFieldModule,
     MatInputModule,
-    MatIconButton,
     MatFormFieldModule,
-    MatIcon, 
     MatInputModule,
     JsonDisplayer,
+    Table,
     BranchInput,
     FormsModule ],
   templateUrl: './app.html',
