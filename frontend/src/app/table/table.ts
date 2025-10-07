@@ -14,9 +14,11 @@ export class Table implements OnInit{
 triggerAction(customer: any) {
   this.http.get(`http://localhost:3000/search?company=${customer.name}&city=${customer.city}`).subscribe((result:any)=>{
     console.log(result); 
-    const links = (result?.results || []).map((r: any) => r.link).filter((link: any) => !!link);
+    const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
     customer.website = links.join(', '); 
+    customer.email = (result?.emails || []).join(", ");
     console.log(customer.website);
+
   });
 
 }
@@ -50,7 +52,8 @@ triggerAction(customer: any) {
     const website =  websiteStr?"http:" + websiteStr: "";
     const name = this.getValueOF(customer, "name");
     const city = this.getValueOF(customer, "city");
-    return {email, website, name, city};
+    const craft = this.getValueOF(customer, "craft");
+    return {email, website, name, city, craft};
   });
   return formattedTags;
 }

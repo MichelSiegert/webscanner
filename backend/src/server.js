@@ -2,13 +2,13 @@ import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 import cors from "cors"; 
+import { crawlPages} from "./crawler.js";
 
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
-
 const PORT = 3000;
 
 const API_KEY = process.env.GOOGLE_API_KEY;
@@ -32,17 +32,28 @@ app.get("/search", async (req, res) => {
       return res.json({ message: "No results found" });
     }
 
-    const results = data.items.map(item => ({
+    const websites = data.items.map((item) => ({
       title: item.title,
       link: item.link,
       snippet: item.snippet
     }));
 
-    res.json({ results });
+    const emailArrays = await Promise.all(
+      websites.map(async (e) => await crawlPages(e.link, []))
+    );
+
+    const allEmails = emailArrays.flat(Infinity);
+
+    const uniqueEmails = [...new Set(allEmails)];
+
+    res.json({ 
+      websites, 
+      "emails": uniqueEmails });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch search results" });
   }
+  console.log("done!");
 });
 
 app.listen(PORT, () => {
