@@ -48,7 +48,7 @@ export class MapComponent implements AfterViewInit {
     tiles.addTo(this.map);
 
     this.map.on('click', async (e) => {
-    this.handwerkerService.getNearbyHandwerker(e.latlng.lat, e.latlng.lng)
+     (await this.handwerkerService.getNearbyCompanies(e.latlng.lat, e.latlng.lng))
     .subscribe((places: any)=>{
       places.elements.forEach((place: any)=>{
         this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
@@ -63,7 +63,6 @@ export class MapComponent implements AfterViewInit {
 
   ngAfterViewInit(): void { 
     this.initMap();
-    this.marker.makeCapitalMarkersCircle(this.map!);
 
     this.branchService.currentBranch.subscribe((newBranch :string)=>{
       this.currrentbranch = newBranch;
