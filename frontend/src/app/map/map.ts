@@ -52,8 +52,10 @@ export class MapComponent implements AfterViewInit {
     .subscribe((places: any)=>{
       places.elements.forEach((place: any)=>{
         this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
-        const marker = L.marker({lat:place.lat,  lng:place.lon});
-        marker.addTo(this.map!);
+        if(place.lat && place.lon) {
+          const marker = L.marker({lat:place.lat,  lng:place.lon});
+          marker.addTo(this.map!);
+        }
        });
       });
 });
