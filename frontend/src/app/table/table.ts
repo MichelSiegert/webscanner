@@ -13,11 +13,9 @@ import { HttpClient } from '@angular/common/http';
 export class Table implements OnInit{
 triggerAction(customer: any) {
   this.http.get(`http://localhost:3000/search?company=${customer.name}&city=${customer.city}`).subscribe((result:any)=>{
-    console.log(result); 
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
     customer.website = links.join(', '); 
     customer.email = (result?.emails || []).join(", ");
-    console.log(customer.website);
 
   });
 
@@ -32,7 +30,6 @@ triggerAction(customer: any) {
   }
 
   private createEntries(data: any[]){
-    console.log(data);
     const tags: any[] = data.map((customer:any)=>{
       return [...((customer.children ?? [])
       .find((e:any) =>e.name === "tags")

@@ -8,19 +8,21 @@ import { FormsModule } from '@angular/forms';
 import { BranchInput } from './branch-input/branch-input';
 import { JsonDisplayer } from './json-displayer/json-displayer';
 import { Table } from './table/table';
+import { Branches } from "./branches/branches";
 
 @Component({
   selector: 'app-root',
-  imports: [MapComponent, 
+  imports: [MapComponent,
     MatSlideToggleModule,
     MatFormFieldModule,
     MatInputModule,
     MatFormFieldModule,
     MatInputModule,
-    JsonDisplayer,
+    //JsonDisplayer,
     Table,
     BranchInput,
-    FormsModule ],
+    FormsModule, 
+    Branches],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers:[MarkerService ]
