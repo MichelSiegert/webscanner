@@ -12,7 +12,7 @@
       </tr>
     </thead>
     <tbody class="bg-white divide-y divide-gray-200">
-      <tr *ngFor="let entry of entries">
+      <tr *ngFor="let entry of filteredEntries">
         <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.name.trim() || '-' }}</td>
         <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.craft.trim() || '-' }}</td>
 
@@ -21,9 +21,9 @@
             <span *ngFor="let email of entry.email.split(', ')">
           {{ email }}<br>
             </span>
-          </ng-container>  
+          </ng-container>
           <ng-template #noLinks>-</ng-template>
-        </td>        
+        </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.city.trim() || '-' }}</td>
         <td>
           <ng-container *ngIf="entry.website; else noLinks">
@@ -34,14 +34,14 @@
           <ng-template #noLinks>-</ng-template>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
-          <button 
-            (click)="triggerAction(entry)" 
+          <button
+            (click)="triggerAction(entry)"
             class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded mr-5"
           >
             Web Analyse
           </button>
-          <button 
-            (click)="triggerAction(entry)" 
+          <button
+            (click)="triggerAction(entry)"
             class="bg-white hover:bg-blue-300 text-blue-600 border-blue-500 font-semibold py-1 px-3 rounded"
           >
             Email senden

@@ -3,6 +3,7 @@ import { MatInputModule } from "@angular/material/input";
 import { JsonReaderService } from '../json-reader';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { CraftFilter } from '../craft-filter';
 
 @Component({
   selector: 'app-table',
@@ -11,23 +12,45 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './table.css'
 })
 export class Table implements OnInit{
+
 triggerAction(customer: any) {
   this.http.get(`http://localhost:3000/search?company=${customer.name}&city=${customer.city}`).subscribe((result:any)=>{
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
-    customer.website = links.join(', '); 
+    customer.website = links.join(', ');
     customer.email = (result?.emails || []).join(", ");
-
   });
-
 }
   public entries : any[]= [];
+  public filteredEntries: any[] = [];
 
-  constructor(private jsonReader: JsonReaderService, private http: HttpClient) {}
+  private selectedCrafts: Set<string> = new Set();
+
+
+  constructor(private jsonReader: JsonReaderService, private http: HttpClient, private craftFilter: CraftFilter) {}
   ngOnInit(): void {
-    this.jsonReader.currentJSON.subscribe((e)=>{
+    this.jsonReader.currentJSON.subscribe((e:any)=>{
       this.entries = this.createEntries(e);
+      this.applyFilter();
+
+    });
+
+
+    this.craftFilter.craftSource.subscribe((crafts) => {
+      this.selectedCrafts = crafts;
+      this.applyFilter();
     });
   }
+
+  private applyFilter() {
+    if (this.selectedCrafts.size === 0) {
+      this.filteredEntries = [...this.entries];
+    } else {
+      this.filteredEntries = this.entries.filter(entry =>
+        this.selectedCrafts.has(entry.craft.trim())
+      );
+    }
+  }
+
 
   private createEntries(data: any[]){
     const tags: any[] = data.map((customer:any)=>{
@@ -45,7 +68,7 @@ triggerAction(customer: any) {
   });
   const formattedTags = unpackedTags.map((customer:any)=>{
     const email = this.getValueOF(customer, "email");
-    const websiteStr = this.getValueOF(customer, " http"); 
+    const websiteStr = this.getValueOF(customer, " http");
     const website =  websiteStr?"http:" + websiteStr: "";
     const name = this.getValueOF(customer, "name");
     const city = this.getValueOF(customer, "city");
@@ -55,10 +78,7 @@ triggerAction(customer: any) {
   return formattedTags;
 }
 
-private getValueOF(customer: any[], value: string): string{
-  return customer.find((e)=>e.key === value)?.value ?? "";
-}
-
-
-
+  private getValueOF(customer: any[], value: string): string{
+    return customer.find((e)=>e.key === value)?.value ?? "";
+  }
 }

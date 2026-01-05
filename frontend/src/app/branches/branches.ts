@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { JsonReaderService } from '../json-reader';
 import { CommonModule } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { CraftFilter } from '../craft-filter';
 
 @Component({
   selector: 'app-branches',
@@ -10,7 +11,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
   styleUrl: './branches.css'
 })
 export class Branches implements OnInit {
-  app: TreeNode[] = [];  
+  app: TreeNode[] = [];
   uniqueCrafts: string[] = [];
   selectedCrafts = new Set<string>();
 
@@ -20,6 +21,8 @@ export class Branches implements OnInit {
       this.app = data;
       this.uniqueCrafts = this.getUniqueCrafts(data);
       this.selectedCrafts = new Set(this.uniqueCrafts);
+      this.craftFilter.craftSource.next(this.selectedCrafts);
+
     })
   }
 
@@ -27,9 +30,11 @@ toggleCraft(craft: string, checked: boolean) {
   checked
     ? this.selectedCrafts.add(craft)
     : this.selectedCrafts.delete(craft);
+  this.craftFilter.craftSource.next(this.selectedCrafts);
+
 }
 
-  constructor(private jsonReaderService: JsonReaderService){}
+  constructor(private jsonReaderService: JsonReaderService, private craftFilter: CraftFilter){}
 
 
   getUniqueCrafts(data: TreeNode[]): string[]{

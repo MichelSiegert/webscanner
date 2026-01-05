@@ -23,7 +23,6 @@ export class JsonDisplayer implements OnInit {
 
   downloadJson(): void {
     const jsonString = JSON.stringify(this.dataSource.data, null, 2);
-    console.log(jsonString);
 
     const blob = new Blob([jsonString], { type: 'application/json' });
 
