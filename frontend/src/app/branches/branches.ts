@@ -15,45 +15,38 @@ export class Branches implements OnInit {
   uniqueCrafts: string[] = [];
   selectedCrafts = new Set<string>();
 
+  constructor(private jsonReaderService: JsonReaderService, private craftFilter: CraftFilter){}
+
 
   ngOnInit(): void {
     this.jsonReaderService.dataSource.subscribe((data: TreeNode[])=>{
       this.app = data;
       this.uniqueCrafts = this.getUniqueCrafts(data);
-      this.selectedCrafts = new Set(this.uniqueCrafts);
-      this.craftFilter.craftSource.next(this.selectedCrafts);
-
     })
   }
 
-toggleCraft(craft: string, checked: boolean) {
-  checked
-    ? this.selectedCrafts.add(craft)
-    : this.selectedCrafts.delete(craft);
-  this.craftFilter.craftSource.next(this.selectedCrafts);
-
-}
-
-  constructor(private jsonReaderService: JsonReaderService, private craftFilter: CraftFilter){}
-
+  toggleCraft(craft: string, checked: boolean) {
+    checked
+      ? this.selectedCrafts.add(craft)
+      : this.selectedCrafts.delete(craft);
+    this.craftFilter.craftSource.next(this.selectedCrafts);
+  }
 
   getUniqueCrafts(data: TreeNode[]): string[]{
-  const crafts = new Set<string>();
+    const crafts = new Set<string>();
 
-  data.forEach((item: TreeNode) => {
-    const tagsNode = item.children?.find(c => c.name === 'tags');
-    if (!tagsNode) return;
+    data.forEach((item: TreeNode) => {
+      const tagsNode = item.children?.find(c => c.name === 'tags');
+      if (!tagsNode) return;
 
-    tagsNode.children?.forEach(tag => {
-      if (tag.name.startsWith('craft:')) {
-        const craftValue = tag.name.split('craft:')[1].trim();
-        crafts.add(craftValue);
-      }
+      tagsNode.children?.forEach(tag => {
+        if (tag.name.startsWith('craft:')) {
+          const craftValue = tag.name.split('craft:')[1].trim();
+          crafts.add(craftValue);
+        }
+      });
     });
-  });
 
-  return Array.from(crafts);
-}
-
-
+    return Array.from(crafts);
+  }
 }
