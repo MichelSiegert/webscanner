@@ -10,22 +10,11 @@ export class JsonReaderService {
   public dataSource = new BehaviorSubject<TreeNode[]>([]);
   currentJSON = this.dataSource.asObservable();
 
-    ngOnInit(): void {
-    this.loadGeoJSON();
-  }
-
-  loadGeoJSON(): void {
-    this.http.get('/assets/data/usa-capitals.geojson').subscribe((data) => {
-      this.dataSource.next(this.convertGeoJSONToTree(data));
-    });
-  }
-
   addToTreeFromJSON(json: any){
     const tmp = this.dataSource.value;
     tmp.push(this.jsonToTree(json, `${json.latlng.lat}, ${json.latlng.lng}`));
     this.dataSource.next(tmp);
   }
-
 
   addLocaleToJson(json: any, name: string, maxDepth: number){
     const tmp = this.dataSource.value;
@@ -35,8 +24,8 @@ export class JsonReaderService {
   }
 
   jsonToTree(
-    data: any, 
-    nodeName: string = 'root',   
+    data: any,
+    nodeName: string = 'root',
     depth: number = 0,
     maxDepth: number = 3): TreeNode {
   if (data === null || data === undefined) {
@@ -44,7 +33,7 @@ export class JsonReaderService {
   }
 
   if (typeof data !== 'object' || depth >= maxDepth) {
-    const value = typeof data === 'object' ? '[Object]' : data; 
+    const value = typeof data === 'object' ? '[Object]' : data;
     return { name: `${nodeName}: ${value}` };
   }
 

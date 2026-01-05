@@ -16,14 +16,13 @@ export class JsonDisplayer implements OnInit {
   public dataSource = new MatTreeNestedDataSource<TreeNode>();
   constructor(private jsonReader: JsonReaderService){}
   ngOnInit(): void {
-    this.jsonReader.loadGeoJSON();
       this.jsonReader.currentJSON.subscribe((newJSON :TreeNode[])=>{
         this.dataSource.data = newJSON;
     });
   }
 
   downloadJson(): void {
-    const jsonString = JSON.stringify(this.dataSource.data, null, 2); 
+    const jsonString = JSON.stringify(this.dataSource.data, null, 2);
     console.log(jsonString);
 
     const blob = new Blob([jsonString], { type: 'application/json' });
@@ -32,11 +31,11 @@ export class JsonDisplayer implements OnInit {
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'myData.json'; 
+    a.download = 'myData.json';
     a.click();
     window.URL.revokeObjectURL(url);
   }
-    
+
 
   childrenAccessor = (node: TreeNode) => node.children ?? [];
   hasChild = (_: number, node: TreeNode) => !!node.children && node.children.length > 0;
