@@ -1,4 +1,5 @@
 interface TreeNode {
-  name: string;
+  key: string;
+  value: string | null;
   children?: TreeNode[];
 }

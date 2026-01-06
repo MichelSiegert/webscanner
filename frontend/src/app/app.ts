@@ -21,8 +21,8 @@ import { Branches } from "./branches/branches";
     //JsonDisplayer,
     Table,
     BranchInput,
-    FormsModule, 
-    Branches],
+    FormsModule,
+    Branches, JsonDisplayer],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers:[MarkerService ]

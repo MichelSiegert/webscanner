@@ -53,20 +53,23 @@ triggerAction(customer: any) {
 
 
   private createEntries(data: any[]){
-    const tags: any[] = data.map((customer:any)=>{
-      return [...((customer.children ?? [])
-      .find((e:any) =>e.name === "tags")
-      ?.children ?? [])]
+
+    const tagsArray: any[] = data.map((customer: any)=>{return [... ((customer.children ?? [])).find((e:TreeNode)=> e.key ==="tags").children ?? []]});
+    const clearedTags = tagsArray.map((tags: TreeNode[]) => {
+      tags.map((tag: TreeNode)=>{
+      if (tag.key?.includes(":")) {
+        return {
+          ...tag,
+          key: tag.key.slice(tag.key.lastIndexOf(":") + 1)
+        };
+      }
+      return tag;
+      });
+      return tags;
     });
-    const unpackedTags = tags.map((customer: any[])=>{
-      return customer.map((tags:any)  =>{
-        const split:string[] = tags.name.split(":");
-        const key: string = split[split.length -2];
-        const value: string = split[split.length - 1];
-        return {key, value}
-    });
-  });
-  const formattedTags = unpackedTags.map((customer:any)=>{
+
+    const formattedTags = clearedTags.map((customer:TreeNode[])=>{
+    console.log(customer);
     const email = this.getValueOF(customer, "email");
     const websiteStr = this.getValueOF(customer, " http");
     const website =  websiteStr?"http:" + websiteStr: "";
@@ -74,7 +77,7 @@ triggerAction(customer: any) {
     const city = this.getValueOF(customer, "city");
     const craft = this.getValueOF(customer, "craft");
     return {email, website, name, city, craft};
-  });
+    });
   return formattedTags;
 }
 

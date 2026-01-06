@@ -36,12 +36,12 @@ export class Branches implements OnInit {
     const crafts = new Set<string>();
 
     data.forEach((item: TreeNode) => {
-      const tagsNode = item.children?.find(c => c.name === 'tags');
+      const tagsNode = item.children?.find(c => c.key === 'tags');
       if (!tagsNode) return;
 
       tagsNode.children?.forEach(tag => {
-        if (tag.name.startsWith('craft:')) {
-          const craftValue = tag.name.split('craft:')[1].trim();
+        if (tag.key.startsWith('craft')) {
+          const craftValue = tag.value!.trim();
           crafts.add(craftValue);
         }
       });
