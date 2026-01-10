@@ -41,7 +41,7 @@ triggerAction(customer: any) {
           }
 
           if (website) {
-            tagsNode = upsertTag(tagsNode, 'http', website);
+            tagsNode = upsertTag(tagsNode, 'website', website);
           }
           return tagsNode;
         })
@@ -104,8 +104,12 @@ triggerAction(customer: any) {
 
     const formattedTags = clearedTags.map((customer:TreeNode[])=>{
     const email = this.getValueOF(customer, "email");
-    const websiteStr = this.getValueOF(customer, " http");
-    const website =  websiteStr?"http:" + websiteStr: "";
+    let website = this.getValueOF(customer, "website") || "";
+
+    if (website && !/^https?:\/\//i.test(website)) {
+        website = 'https://' + website;
+    }
+
     const name = this.getValueOF(customer, "name");
     const city = this.getValueOF(customer, "city");
     const craft = this.getValueOF(customer, "craft");
