@@ -4,6 +4,7 @@ import { JsonReaderService } from '../json-reader';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CraftFilter } from '../craft-filter';
+import { TreeNode, updateTree, upsertTag } from '../../data/TreeNote';
 
 @Component({
   selector: 'app-table',
@@ -17,7 +18,40 @@ triggerAction(customer: any) {
   this.http.get(`http://localhost:3000/search?company=${customer.name}&city=${customer.city}`).subscribe((result:any)=>{
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
     customer.website = links.join(', ');
-    customer.email = (result?.emails || []).join(", ");
+
+    const website = links.join(', ');
+    const email = (result?.emails || []).join(", ");
+
+    console.log(website, email)
+    const updated = updateTree(
+    this.jsonReader.dataSource.value,
+    (node: TreeNode) => node.key === customer.name,
+    node => {
+      if (!node.children) return node;
+
+      return {
+        ...node,
+        children: node.children.map(child => {
+          if (child.key !== 'tags') return child;
+
+          let tagsNode = child;
+
+          if (email) {
+            tagsNode = upsertTag(tagsNode, 'email', email);
+          }
+
+          if (website) {
+            tagsNode = upsertTag(tagsNode, 'http', website);
+          }
+          return tagsNode;
+        })
+      };
+    }
+  );
+  this.jsonReader.dataSource.next(updated)
+
+
+
   });
 }
   public entries : any[]= [];
@@ -69,7 +103,6 @@ triggerAction(customer: any) {
     });
 
     const formattedTags = clearedTags.map((customer:TreeNode[])=>{
-    console.log(customer);
     const email = this.getValueOF(customer, "email");
     const websiteStr = this.getValueOF(customer, " http");
     const website =  websiteStr?"http:" + websiteStr: "";

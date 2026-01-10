@@ -5,6 +5,7 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule, MatIconButton } from '@angular/material/button';
 import { JsonReaderService } from '../json-reader';
+import { TreeNode } from '../../data/TreeNote';
 
 @Component({
   selector: 'app-json-displayer',
