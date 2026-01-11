@@ -3,7 +3,7 @@ import { JsonReaderService } from '../json-reader';
 import { CommonModule } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { CraftFilter } from '../craft-filter';
-import { TreeNode } from '../../data/TreeNote';
+import { TreeNode } from '../../data/TreeNode';
 
 @Component({
   selector: 'app-branches',

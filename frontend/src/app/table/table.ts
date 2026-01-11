@@ -4,18 +4,22 @@ import { JsonReaderService } from '../json-reader';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CraftFilter } from '../craft-filter';
-import { TreeNode, updateTree, upsertTag } from '../../data/TreeNote';
+import { TreeNode, updateTree, upsertTag } from '../../data/TreeNode';
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 @Component({
   selector: 'app-table',
-  imports: [MatInputModule, CommonModule],
+  imports: [MatInputModule, CommonModule,MatFormFieldModule, MatSelectModule, MatInputModule],
   templateUrl: './table.html',
   styleUrl: './table.css'
 })
 export class Table implements OnInit{
 
+
 triggerAction(customer: any) {
-  this.http.get(`http://localhost:3000/search?company=${customer.name}&city=${customer.city}`).subscribe((result:any)=>{
+  this.http.get(`http://localhost:3000/search?company=${customer.name}&city=${customer.city}`)
+  .subscribe((result:any)=>{
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
     customer.website = links.join(', ');
 
@@ -64,6 +68,7 @@ triggerAction(customer: any) {
   ngOnInit(): void {
     this.jsonReader.currentJSON.subscribe((e:any)=>{
       this.entries = this.createEntries(e);
+
       this.applyFilter();
 
     });
@@ -109,11 +114,16 @@ triggerAction(customer: any) {
     if (website && !/^https?:\/\//i.test(website)) {
         website = 'https://' + website;
     }
+    const websiteUrls = website
+      ? website.split(',').map(w => w.trim()).filter(Boolean)
+      : [];
+    const selectedWebsite = websiteUrls[0] ?? null;
 
     const name = this.getValueOF(customer, "name");
     const city = this.getValueOF(customer, "city");
     const craft = this.getValueOF(customer, "craft");
-    return {email, website, name, city, craft};
+
+    return {email, website, selectedWebsite, name, city, craft };
     });
   return formattedTags;
 }

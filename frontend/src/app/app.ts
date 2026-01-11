@@ -18,11 +18,11 @@ import { Branches } from "./branches/branches";
     MatInputModule,
     MatFormFieldModule,
     MatInputModule,
-    //JsonDisplayer,
+    JsonDisplayer,
     Table,
     BranchInput,
     FormsModule,
-    Branches, JsonDisplayer],
+    Branches],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers:[MarkerService ]

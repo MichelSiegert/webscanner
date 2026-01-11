@@ -26,12 +26,35 @@
         </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.city.trim() || '-' }}</td>
         <td>
-          <ng-container *ngIf="entry.website; else noLinks">
-            <span *ngFor="let link of entry.website.split(', ')">
-              <a [href]="link" target="_blank" class="text-blue-600 hover:underline">{{ link }}</a><br>
-            </span>
-          </ng-container>
-          <ng-template #noLinks>-</ng-template>
+          <mat-form-field>
+            <mat-label>Website</mat-label>
+
+            <mat-select
+              [(value)]="entry.selectedWebsite"
+              [disabled]="!entry.website?.trim()"
+            >
+              @if (entry.website?.trim()) {
+                @for (url of entry.website.split(', '); track url) {
+                  <mat-option [value]="url">{{ url }}</mat-option>
+                }
+              } @else {
+                <mat-option disabled>-</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (entry.selectedWebsite) {
+            <div class="mt-2">
+              <a
+                [href]="entry.selectedWebsite"
+                target="_blank"
+                rel="noopener"
+                class="text-blue-600 hover:underline"
+              >
+                {{ entry.selectedWebsite }}
+              </a>
+            </div>
+          }
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
           <button

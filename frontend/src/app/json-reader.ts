@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, max } from 'rxjs';
-import { TreeNode } from '../data/TreeNote';
+import { TreeNode } from '../data/TreeNode';
 
 @Injectable({
   providedIn: 'root'
