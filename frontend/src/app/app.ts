@@ -18,7 +18,6 @@ import { Branches } from "./branches/branches";
     MatInputModule,
     MatFormFieldModule,
     MatInputModule,
-    JsonDisplayer,
     Table,
     BranchInput,
     FormsModule,
