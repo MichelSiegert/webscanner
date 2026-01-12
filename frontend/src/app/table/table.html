@@ -79,13 +79,24 @@
             </div>
           }
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-center">
-          <button
-            (click)="triggerAction(entry)"
-            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded mr-5"
-          >
+        <td class="px-6 py-4 whitespace-nowrap text-center flex">
+        <button
+          (click)="triggerAction(entry)"
+          [disabled]="entry.isAnalyzing"
+          class="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300
+                text-white font-semibold py-1 px-3 rounded mr-5
+                flex items-center justify-center min-w-[120px]"
+        >
+          @if (entry.isAnalyzing) {
+            <mat-progress-spinner
+              diameter="20"
+              mode="indeterminate"
+              color="white">
+            </mat-progress-spinner>
+          } @else {
             Web Analyse
-          </button>
+          }
+        </button>
           <button
             (click)="triggerAction(entry)"
             class="bg-white hover:bg-blue-300 text-blue-600 border-blue-500 font-semibold py-1 px-3 rounded"

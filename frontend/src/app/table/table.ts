@@ -7,10 +7,18 @@ import { CraftFilter } from '../craft-filter';
 import { TreeNode, updateTree, upsertTag } from '../../data/TreeNode';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-table',
-  imports: [MatInputModule, CommonModule,MatFormFieldModule, MatSelectModule, MatInputModule],
+  imports: [
+    MatInputModule,
+    CommonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './table.html',
   styleUrl: './table.css'
 })
@@ -18,6 +26,9 @@ export class Table implements OnInit{
 
 
 triggerAction(customer: any) {
+  if (customer.isAnalyzing) return;
+  customer.isAnalyzing = true;
+
   this.http.get(`http://localhost:3000/search?company=${customer.name}&city=${customer.city}`)
   .subscribe((result:any)=>{
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
@@ -124,8 +135,9 @@ triggerAction(customer: any) {
     const name = this.getValueOF(customer, "name");
     const city = this.getValueOF(customer, "city");
     const craft = this.getValueOF(customer, "craft");
+    const isAnalyzing= false
 
-    return {email, selectedEmail, website, selectedWebsite, name, city, craft};
+    return {email, selectedEmail, website, selectedWebsite, name, city, craft, isAnalyzing};
     });
   return formattedTags;
 }
