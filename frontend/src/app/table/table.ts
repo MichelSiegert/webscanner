@@ -108,7 +108,8 @@ triggerAction(customer: any) {
     });
 
     const formattedTags = clearedTags.map((customer:TreeNode[])=>{
-    const email = this.getValueOF(customer, "email");
+    const email = this.getValueOF(customer, "email") ?? [];
+
     let website = this.getValueOF(customer, "website") || "";
 
     if (website && !/^https?:\/\//i.test(website)) {
@@ -118,12 +119,13 @@ triggerAction(customer: any) {
       ? website.split(',').map(w => w.trim()).filter(Boolean)
       : [];
     const selectedWebsite = websiteUrls[0] ?? null;
+    const selectedEmail = email.split(", ")[0] ?? null;
 
     const name = this.getValueOF(customer, "name");
     const city = this.getValueOF(customer, "city");
     const craft = this.getValueOF(customer, "craft");
 
-    return {email, website, selectedWebsite, name, city, craft };
+    return {email, selectedEmail, website, selectedWebsite, name, city, craft};
     });
   return formattedTags;
 }

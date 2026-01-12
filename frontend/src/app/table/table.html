@@ -1,4 +1,4 @@
-<div class="mx-auto mt-6 bg-white shadow-lg rounded-lg max-h-6/12 overflow-auto">
+<div class="mx-2 mt-6 bg-white shadow-lg rounded-lg max-h-6/12 overflow-auto mb-5 ">
   <table class="min-w-full divide-y divide-gray-200">
     <thead class="bg-gray-200">
       <tr>
@@ -17,12 +17,35 @@
         <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.craft.trim() || '-' }}</td>
 
         <td>
-          <ng-container *ngIf="entry.email ; else noLinks">
-            <span *ngFor="let email of entry.email.split(', ')">
-          {{ email }}<br>
-            </span>
-          </ng-container>
-          <ng-template #noLinks>-</ng-template>
+          <mat-form-field>
+            <mat-label>Email</mat-label>
+
+            <mat-select
+              [(value)]="entry.selectedEmail"
+              [disabled]="!entry.email?.trim()"
+            >
+              @if (entry.email?.trim()) {
+                @for (email of entry.email.split(', '); track email) {
+                  <mat-option [value]="email">{{ email }}</mat-option>
+                }
+              } @else {
+                <mat-option disabled>-</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          @if (entry.selectedEmail) {
+            <div class="mt-2">
+              <a
+                [href]="entry.selectedEmail"
+                target="_blank"
+                rel="noopener"
+                class="text-blue-600 hover:underline"
+              >
+                {{ entry.selectedEmail }}
+              </a>
+            </div>
+          }
         </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.city.trim() || '-' }}</td>
         <td>
