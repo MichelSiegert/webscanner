@@ -30,8 +30,9 @@ export class MapComponent implements AfterViewInit {
   currrentbranch: string = "";
 
 
-  
+
   private map: L.Map | undefined;
+  private markerLayer = L.layerGroup();
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -44,27 +45,45 @@ export class MapComponent implements AfterViewInit {
       minZoom: 3,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
-    
+
     tiles.addTo(this.map);
 
-    this.map.on('click', async (e) => {
-     (await this.handwerkerService.getNearbyCompanies(e.latlng.lat, e.latlng.lng))
-    .subscribe((places: any)=>{
-      places.elements.forEach((place: any)=>{
-        this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
-        if(place.lat && place.lon) {
-          const marker = L.marker({lat:place.lat,  lng:place.lon});
-          marker.addTo(this.map!);
+  this.map.on('click', async (e) => {
+    const result = await this.handwerkerService.getNearbyCompanies(e.latlng.lat, e.latlng.lng);
+
+    result.subscribe((places: any) => {
+      places.elements.forEach((place: any) => {
+        if (place.lat && place.lon) {
+          const alreadyExists = this.isMarkerAt(place.lat, place.lon);
+
+          if (!alreadyExists) {
+            this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
+
+            const marker = L.marker([place.lat, place.lon]);
+            (marker as any).companyData = place;
+
+            marker.addTo(this.markerLayer);
+          }
         }
-       });
       });
+    });
 });
-  }
+}
+  isMarkerAt(lat: any, lon: any) {
+  let exists = false;
+  this.markerLayer.eachLayer((layer: any) => {
+    const pos = layer.getLatLng();
+    if (Math.abs(pos.lat - lat) < 0.0001 && Math.abs(pos.lng - lon) < 0.0001) {
+      exists = true;
+    }
+  });
+  return exists;  }
 
   constructor(private marker : MarkerService, private branchService: BranchService, private jsonReader: JsonReaderService, private handwerkerService : overpassService) {  }
 
-  ngAfterViewInit(): void { 
+  ngAfterViewInit(): void {
     this.initMap();
+    this.markerLayer.addTo(this.map!);
 
     this.branchService.currentBranch.subscribe((newBranch :string)=>{
       this.currrentbranch = newBranch;
