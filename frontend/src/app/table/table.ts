@@ -24,6 +24,27 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class Table implements OnInit{
 
+  public entries : any[]= [];
+  public filteredEntries: any[] = [];
+
+  private selectedCrafts: Set<string> = new Set();
+
+  constructor(private jsonReader: JsonReaderService, private http: HttpClient, private craftFilter: CraftFilter) {}
+  ngOnInit(): void {
+    this.jsonReader.currentJSON.subscribe((e:any)=>{
+      this.entries = this.createEntries(e);
+
+      this.applyFilter();
+
+    });
+
+
+    this.craftFilter.craftSource.subscribe((crafts) => {
+      this.selectedCrafts = crafts;
+      this.applyFilter();
+    });
+  }
+
   persistSelection(customer: any, key: string, value: string) {
   const updated = updateTree(
     this.jsonReader.dataSource.value,
@@ -36,7 +57,6 @@ export class Table implements OnInit{
         children: node.children.map(child => {
           if (child.key !== 'tags') return child;
           let tagsNode = child;
-          console.log(key, value);
           tagsNode = upsertTag(tagsNode, key, value);
           return tagsNode
         })
@@ -59,64 +79,40 @@ triggerAction(customer: any) {
     const website = links.join(', ');
     const email = (result?.emails || []).join(", ");
 
-    console.log(website, email)
     const updated = updateTree(
     this.jsonReader.dataSource.value,
     (node: TreeNode) => node.key === customer.name,
     node => {
-      if (!node.children) return node;
-
-      return {
-        ...node,
-        children: node.children.map(child => {
-          if (child.key !== 'tags') return child;
-
-          let tagsNode = child;
-
-          if (email) {
-            tagsNode = upsertTag(tagsNode, 'email', email);
-          }
-
-          if (website) {
-            tagsNode = upsertTag(tagsNode, 'website', website);
-          }
-
-          if(customer.isAnalyzing) {
-            tagsNode = upsertTag(tagsNode, 'isAnalyzing', "false");
-          }
-
-          return tagsNode;
-        })
-      };
-    }
+          const updatedNode = this.updateTagsInNode(node, {
+            isAnalyzing: 'false',
+            finishedAnalyzing: 'true',
+            email: email,
+            website: website
+          });
+          return updatedNode;
+        }
   );
   this.jsonReader.dataSource.next(updated)
-
-
-
   });
 }
-  public entries : any[]= [];
-  public filteredEntries: any[] = [];
-
-  private selectedCrafts: Set<string> = new Set();
 
 
-  constructor(private jsonReader: JsonReaderService, private http: HttpClient, private craftFilter: CraftFilter) {}
-  ngOnInit(): void {
-    this.jsonReader.currentJSON.subscribe((e:any)=>{
-      this.entries = this.createEntries(e);
-
-      this.applyFilter();
-
-    });
-
-
-    this.craftFilter.craftSource.subscribe((crafts) => {
-      this.selectedCrafts = crafts;
-      this.applyFilter();
-    });
-  }
+private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}): TreeNode {
+  if (!node.children) return node;
+  return {
+    ...node,
+    children: node.children.map(child => {
+      if (child.key !== 'tags') return child;
+      let tagsNode = child;
+      Object.keys(tagsToUpdate).forEach(key => {
+        if (tagsToUpdate[key]) {
+          tagsNode = upsertTag(tagsNode, key, tagsToUpdate[key]);
+        }
+      });
+      return tagsNode;
+    })
+  };
+}
 
   private applyFilter() {
     if (this.selectedCrafts.size === 0) {
@@ -163,8 +159,9 @@ triggerAction(customer: any) {
     const city = this.getValueOF(customer, "city");
     const craft = this.getValueOF(customer, "craft");
     const isAnalyzing = this.getValueOF(customer, "isAnalyzing") === 'true';
+    const finishedAnalyzing = this.getValueOF(customer, "finishedAnalyzing") === 'true';
 
-    return {email, selectedEmail, website, selectedWebsite, name, city, craft, isAnalyzing};
+    return {email, selectedEmail, website, selectedWebsite, name, city, craft, isAnalyzing, finishedAnalyzing};
     });
   return formattedTags;
 }

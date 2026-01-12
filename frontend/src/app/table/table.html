@@ -84,7 +84,7 @@
         <td class="px-6 py-4 whitespace-nowrap text-center flex">
         <button
           (click)="triggerAction(entry)"
-          [disabled]="entry.isAnalyzing"
+          [disabled]="entry.isAnalyzing || entry.finishedAnalyzing"
           class="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300
                 text-white font-semibold py-1 px-3 rounded mr-5
                 flex items-center justify-center min-w-[120px]"
