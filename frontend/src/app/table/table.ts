@@ -24,6 +24,28 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class Table implements OnInit{
 
+  persistSelection(customer: any, key: string, value: string) {
+  const updated = updateTree(
+    this.jsonReader.dataSource.value,
+    (node: TreeNode) => node.key === customer.name,
+    (node: TreeNode) => {
+      if (!node.children) return node;
+
+      return {
+        ...node,
+        children: node.children.map(child => {
+          if (child.key !== 'tags') return child;
+          let tagsNode = child;
+          console.log(key, value);
+          tagsNode = upsertTag(tagsNode, key, value);
+          return tagsNode
+        })
+      };
+    }
+  );
+  this.jsonReader.dataSource.next(updated);
+}
+
 
 triggerAction(customer: any) {
   if (customer.isAnalyzing) return;
@@ -58,6 +80,11 @@ triggerAction(customer: any) {
           if (website) {
             tagsNode = upsertTag(tagsNode, 'website', website);
           }
+
+          if(customer.isAnalyzing) {
+            tagsNode = upsertTag(tagsNode, 'isAnalyzing', "false");
+          }
+
           return tagsNode;
         })
       };
@@ -129,13 +156,13 @@ triggerAction(customer: any) {
     const websiteUrls = website
       ? website.split(',').map(w => w.trim()).filter(Boolean)
       : [];
-    const selectedWebsite = websiteUrls[0] ?? null;
-    const selectedEmail = email.split(", ")[0] ?? null;
+    const selectedWebsite = this.getValueOF(customer, "selectedWebsite") || (websiteUrls[0] ?? null);
+    const selectedEmail = this.getValueOF(customer, "selectedEmail") || (email.split(", ")[0] ?? null);
 
     const name = this.getValueOF(customer, "name");
     const city = this.getValueOF(customer, "city");
     const craft = this.getValueOF(customer, "craft");
-    const isAnalyzing= false
+    const isAnalyzing = this.getValueOF(customer, "isAnalyzing") === 'true';
 
     return {email, selectedEmail, website, selectedWebsite, name, city, craft, isAnalyzing};
     });
