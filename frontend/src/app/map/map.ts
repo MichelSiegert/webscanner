@@ -4,6 +4,7 @@ import { MarkerService } from '../marker';
 import { BranchService } from '../branch-service';
 import { JsonReaderService } from '../json-reader';
 import { overpassService } from '../overpass-service';
+import { CraftFilter } from '../craft-filter';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -33,6 +34,15 @@ export class MapComponent implements AfterViewInit {
 
   private map: L.Map | undefined;
   private markerLayer = L.layerGroup();
+  private allMarkers: { marker: L.Marker, craft: string }[] = [];
+
+  constructor(
+    private craftFilter: CraftFilter,
+    private marker : MarkerService,
+    private branchService: BranchService,
+    private jsonReader: JsonReaderService,
+    private handwerkerService : overpassService) {  }
+
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -50,19 +60,24 @@ export class MapComponent implements AfterViewInit {
 
   this.map.on('click', async (e) => {
     const result = await this.handwerkerService.getNearbyCompanies(e.latlng.lat, e.latlng.lng);
-
     result.subscribe((places: any) => {
+      console.log(places);
       places.elements.forEach((place: any) => {
         if (place.lat && place.lon) {
           const alreadyExists = this.isMarkerAt(place.lat, place.lon);
+          const craft = place.tags.craft;
 
           if (!alreadyExists) {
-            this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
 
+            this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
             const marker = L.marker([place.lat, place.lon]);
+            this.allMarkers.push({ marker, craft });
             (marker as any).companyData = place;
 
-            marker.addTo(this.markerLayer);
+            const currentFilter = this.craftFilter.craftSource.value;
+            if (currentFilter.size === 0 || currentFilter.has(craft)) {
+              marker.addTo(this.markerLayer);
+            }
           }
         }
       });
@@ -79,7 +94,6 @@ export class MapComponent implements AfterViewInit {
   });
   return exists;  }
 
-  constructor(private marker : MarkerService, private branchService: BranchService, private jsonReader: JsonReaderService, private handwerkerService : overpassService) {  }
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -87,6 +101,18 @@ export class MapComponent implements AfterViewInit {
 
     this.branchService.currentBranch.subscribe((newBranch :string)=>{
       this.currrentbranch = newBranch;
+    });
+
+    this.craftFilter.craftSource.subscribe((selectedCrafts: Set<string>) => {
+      this.filterMarkers(selectedCrafts);
+    });
+  }
+  filterMarkers(selectedCrafts: Set<string>) {
+    this.markerLayer.clearLayers();
+    this.allMarkers.forEach(item => {
+      if (selectedCrafts.size === 0 || selectedCrafts.has(item.craft)) {
+        item.marker.addTo(this.markerLayer);
+      }
     });
   }
 
