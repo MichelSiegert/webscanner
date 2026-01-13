@@ -61,7 +61,6 @@ export class MapComponent implements AfterViewInit {
   this.map.on('click', async (e) => {
     const result = await this.handwerkerService.getNearbyCompanies(e.latlng.lat, e.latlng.lng);
     result.subscribe((places: any) => {
-      console.log(places);
       places.elements.forEach((place: any) => {
         if (place.lat && place.lon) {
           const alreadyExists = this.isMarkerAt(place.lat, place.lon);
