@@ -112,7 +112,7 @@ private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}):
       return tagsNode;
     })
   };
-}
+  }
 
   private applyFilter() {
     if (this.selectedCrafts.size === 0) {
@@ -164,7 +164,7 @@ private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}):
     return {email, selectedEmail, website, selectedWebsite, name, city, craft, isAnalyzing, finishedAnalyzing};
     });
   return formattedTags;
-}
+  }
 
   private getValueOF(customer: any[], value: string): string{
     return customer.find((e)=>e.key === value)?.value ?? "";
