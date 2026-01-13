@@ -70,8 +70,7 @@ export class Table implements OnInit{
 triggerAction(customer: any) {
   if (customer.isAnalyzing) return;
   customer.isAnalyzing = true;
-
-  this.http.get(`http://localhost:3000/search?company=${customer.name}&city=${customer.city}`)
+  this.http.get(`/api/search?company=${customer.name}&city=${customer.city}`)
   .subscribe((result:any)=>{
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
     customer.website = links.join(', ');

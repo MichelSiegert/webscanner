@@ -18,7 +18,7 @@ spec:
         app: web-scan-frontend
     spec:
       containers:
-      - image: web-scan-frontend
+      - image: web-scan-frontend:v2
         name: web-scan-frontend
         imagePullPolicy: Never
         resources: {}

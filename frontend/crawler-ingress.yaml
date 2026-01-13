@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-scan-ingress
+  annotations:
+    # Use $2 to capture everything after /api/
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api(/|$)(.*)  # Matches /api, /api/, and /api/anything
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: web-scan-crawler
+            port:
+              number: 3000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-scan-frontend
+            port:
+              number: 80
