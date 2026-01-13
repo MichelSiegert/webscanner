@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: web-scan-frontend
+  name: web-scan-frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-scan-frontend
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: web-scan-frontend
+    spec:
+      containers:
+      - image: web-scan-frontend
+        name: web-scan-frontend
+        imagePullPolicy: Never
+        resources: {}
+status: {}

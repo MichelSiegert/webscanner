@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: web-scan-frontend
+  name: web-scan-frontend
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    nodePort: 30001
+  selector:
+    app: web-scan-frontend
+  type: NodePort
+status:
+  loadBalancer: {}
