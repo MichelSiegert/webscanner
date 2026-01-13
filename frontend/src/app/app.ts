@@ -26,5 +26,5 @@ import { Branches } from "./branches/branches";
   providers:[MarkerService ]
 })
 export class App {
-  protected readonly title = signal('angular-leaflet-example');
+  protected readonly title = signal('web-scan-frontend');
 }
