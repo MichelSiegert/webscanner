@@ -1,0 +1,7 @@
+resources:
+  - web-scan-frontend.yaml
+  - web-scan-crawler.yaml
+  - web-scan-svc-dev.yaml
+  - web-scan-crawler-svc.yaml
+  - frontend-ingress-dev.yaml
+  - crawler-ingress.yaml

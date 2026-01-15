@@ -18,8 +18,13 @@ spec:
         app: web-scan-frontend
     spec:
       containers:
-      - image: web-scan-frontend:v2
+      - image: web-scan-frontend
         name: web-scan-frontend
+        env:
+        - name: VITE_HMR_HOST
+          value: "localhost"
+        - name: VITE_HMR_PORT
+          value: "30001"
         imagePullPolicy: Never
         resources: {}
 status: {}

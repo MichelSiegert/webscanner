@@ -1,0 +1,18 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: webscanner
+build:
+  artifacts:
+    - image: web-scan-crawler
+      context: crawler
+      docker:
+        dockerfile: Dockerfile.dev
+    - image: web-scan-frontend
+      context: frontend
+      docker:
+        dockerfile: Dockerfile.dev
+manifests:
+  kustomize:
+    paths:
+      - deployments

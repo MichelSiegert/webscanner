@@ -12,4 +12,4 @@ spec:
           service:
             name: web-scan-frontend
             port:
-              number: 80
+              number: 4200
