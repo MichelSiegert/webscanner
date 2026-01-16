@@ -8,6 +8,7 @@ import { TreeNode, updateTree, upsertTag } from '../../data/TreeNode';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-table',
@@ -17,7 +18,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatPaginatorModule
   ],
   templateUrl: './table.html',
   styleUrl: './table.css'
@@ -26,6 +28,9 @@ export class Table implements OnInit{
 
   public entries : any[]= [];
   public filteredEntries: any[] = [];
+  public paginatedEntries: any[] = [];
+  private currentPageSize = 5;
+  public currentPageIndex = 0;
 
   private selectedCrafts: Set<string> = new Set();
 
@@ -40,6 +45,7 @@ export class Table implements OnInit{
 
 
     this.craftFilter.craftSource.subscribe((crafts) => {
+      this.currentPageIndex= 0;
       this.selectedCrafts = crafts;
       this.applyFilter();
     });
@@ -65,6 +71,18 @@ export class Table implements OnInit{
   );
   this.jsonReader.dataSource.next(updated);
 }
+
+  updatePagination() {
+    const startIndex = this.currentPageIndex * this.currentPageSize;
+    const endIndex = startIndex + this.currentPageSize;
+    this.paginatedEntries = this.filteredEntries.slice(startIndex, endIndex);
+  }
+
+  onPageChange(event: PageEvent) {
+    this.currentPageSize = event.pageSize;
+    this.currentPageIndex = event.pageIndex;
+    this.updatePagination();
+  }
 
 
 triggerAction(customer: any) {
@@ -121,6 +139,8 @@ private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}):
         this.selectedCrafts.has(entry.craft.trim())
       );
     }
+    this.currentPageIndex = 0;
+    this.updatePagination();
   }
 
 

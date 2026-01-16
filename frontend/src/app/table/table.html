@@ -12,7 +12,7 @@
       </tr>
     </thead>
     <tbody class="bg-white divide-y divide-gray-200">
-      <tr *ngFor="let entry of filteredEntries">
+      <tr *ngFor="let entry of paginatedEntries">
         <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.name.trim() || '-' }}</td>
         <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.craft.trim() || '-' }}</td>
 
@@ -125,4 +125,12 @@
       </tr>
     </tbody>
   </table>
+  <mat-paginator
+    [length]="filteredEntries.length"
+    [pageSize]="5"
+    [pageSizeOptions]="[5, 10, 25, 100]"
+    [pageIndex]="this.currentPageIndex"
+    (page)="onPageChange($event)"
+    aria-label="Select page">
+  </mat-paginator>
 </div>
