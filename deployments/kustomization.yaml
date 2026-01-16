@@ -1,9 +1,9 @@
 resources:
-  - web-scan-frontend.yaml
-  - web-scan-crawler.yaml
-  - web-scan-svc-dev.yaml
-  - web-scan-crawler-svc.yaml
-  - frontend-ingress-dev.yaml
-  - crawler-ingress.yaml
-  - ingress-maildev.yaml
+  - deployment-frontend.yaml
+  - deployment-crawler.yaml
   - deployment-maildev.yaml
+  - svc-dev-frontend.yaml
+  - svc-crawler.yaml
+  - ingress-dev-frontend.yaml
+  - ingress-crawler.yaml
+  - ingress-maildev.yaml
