@@ -12,6 +12,10 @@ build:
       context: frontend
       docker:
         dockerfile: Dockerfile.dev
+    - image: web-scan-email
+      context: email
+      docker: 
+        dockerfile: Dockerfile
 manifests:
   kustomize:
     paths:
