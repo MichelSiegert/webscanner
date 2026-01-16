@@ -6,7 +6,7 @@ metadata:
     app: web-scan-email
   name: web-scan-email
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: web-scan-email
