@@ -46,6 +46,10 @@
                 {{ entry.selectedEmail }}
               </a>
             </div>
+          } @else {
+             <div class="mt-2">
+              -
+             </div>
           }
         </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.city.trim() || '-' }}</td>
@@ -79,6 +83,10 @@
                 {{ entry.selectedWebsite }}
               </a>
             </div>
+          } @else {
+             <div class="mt-2">
+              -
+             </div>
           }
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center flex">
