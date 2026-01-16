@@ -3,42 +3,26 @@ import smtplib
 from email.message import EmailMessage
 
 app = FastAPI(
-    title="Email Test API",
-    description="A simple API to test sending emails via MailDev",
-    version="1.0.0"
+    title="Email API",
+    description="API for sending emails",
+    version="1.0",
+    root_path="/email"
 )
 
-@app.get("/send-email", tags=["Email"], summary="Send a test email")
-def send_email():
-    """
-    Sends a test email to your MailDev instance.
-    """
+@app.get("/")
+def send_test_mail(email:str = "michel@siegert.online", website: str= "https://michel.siegert.online" ):
     msg = EmailMessage()
-    msg.set_content("This is a test email from FastAPI!")
-    msg["Subject"] = "FastAPI MailDev Test"
+    msg.set_content(website)
+    msg["Subject"] = "testing mail"
     msg["From"] = "sender@example.com"
-    msg["To"] = "receiver@example.com"
-    
+    msg["To"] = email
     try:
-        with smtplib.SMTP("maildev", 1025, timeout=10) as server:
+        with smtplib.SMTP("maildev", 1025) as server:
             server.send_message(msg)
-        return {"status": "success", "message": "Email sent to MailDev successfully"}
-    except smtplib.SMTPConnectError:
-        return {"status": "error", "details": "Failed to connect to MailDev. Is the service running?"}
+        return {"status": "success", "message": "message sent!"}
     except Exception as e:
         return {"status": "error", "details": str(e)}
 
-@app.get("/health", tags=["Health"], summary="Health check endpoint")
-def health_check():
-    """
-    Verify the API is operational.
-    """
-    return {"status": "ok", "service": "Email Test API", "version": "1.0.0"}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=8000
-    )
+@app.get("/healz")
+def send_test_mail():
+    return {"status": "ok"}
