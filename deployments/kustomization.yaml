@@ -5,3 +5,5 @@ resources:
   - web-scan-crawler-svc.yaml
   - frontend-ingress-dev.yaml
   - crawler-ingress.yaml
+  - ingress-maildev.yaml
+  - deployment-maildev.yaml
