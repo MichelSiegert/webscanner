@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+# Use a stateful setup to ensure that for a rolling update Pods are restarted with a rolling strategy one-by-one.
+# This prevents losing in-memory information stored redundantly in two Pods.
+kind: StatefulSet
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.keycloak.StatefulSet.name }}
+  labels:
+    app: {{ .Values.keycloak.StatefulSet.name }}
+spec:
+  serviceName: keycloak-discovery
+  # Run with one replica to save resources, or with two replicas to allow for rolling updates for configuration changes
+  replicas: {{ .Values.keycloak.StatefulSet.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.keycloak.StatefulSet.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.keycloak.StatefulSet.name }}
+    spec:
+      containers:
+        - name: {{ .Values.keycloak.StatefulSet.name }}
+          image: quay.io/keycloak/keycloak:26.5.1
+          args: ["start"]
+          env:
+            - name: KC_BOOTSTRAP_ADMIN_USERNAME
+              value: {{ .Values.keycloak.StatefulSet.containers.env.username }}
+            - name: KC_BOOTSTRAP_ADMIN_PASSWORD
+              value: {{ .Values.keycloak.StatefulSet.containers.env.password }}
+            # In a production environment, add a TLS certificate to Keycloak to either end-to-end encrypt the traffic between
+            # the client or Keycloak, or to encrypt the traffic between your proxy and Keycloak.
+            # Respect the proxy headers forwarded by the reverse proxy
+            # In a production environment, verify which proxy type you are using, and restrict access to Keycloak
+            # from other sources than your proxy if you continue to use proxy headers.
+            - name: KC_PROXY_HEADERS
+              value: {{ .Values.keycloak.StatefulSet.containers.env.headers }}
+            - name: KC_HTTP_ENABLED
+              value: {{ .Values.keycloak.StatefulSet.containers.env.httpEnabled | quote }}
+            # In this explorative setup, no strict hostname is set.
+            # For production environments, set a hostname for a secure setup.
+            - name: KC_HOSTNAME_STRICT
+              value: {{ .Values.keycloak.StatefulSet.containers.env.strictHostname | quote }}
+            - name: KC_HEALTH_ENABLED
+              value: {{ .Values.keycloak.StatefulSet.containers.env.healthEnabled | quote }}
+            - name: 'KC_CACHE'
+              value: {{ .Values.keycloak.StatefulSet.containers.env.cache }}
+            # Passing the Pod's IP primary address to the JGroups clustering as this is required in IPv6 only setups
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            # Instruct JGroups which DNS hostname to use to discover other Keycloak nodes
+            # Needs to be unique for each Keycloak cluster
+            - name: KC_CACHE_EMBEDDED_NETWORK_BIND_ADDRESS
+              value: '$(POD_IP)'
+            - name: 'KC_DB_URL_DATABASE'
+              value: {{ .Values.keycloak.postgres.deployment.db }}
+            - name: 'KC_DB_URL_HOST'
+              value: {{ .Values.keycloak.postgres.deployment.name }}
+            - name: 'KC_DB'
+              value: postgres
+            # In a production environment, use a secret to store username and password to the database
+            - name: 'KC_DB_PASSWORD'
+              value: {{ .Values.keycloak.postgres.deployment.password }}
+            - name: 'KC_DB_USERNAME'
+              value: {{ .Values.keycloak.postgres.deployment.user }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.keycloak.StatefulSet.containers.ports.http }}
+            - name: jgroups
+              containerPort: {{ .Values.keycloak.StatefulSet.containers.ports.jgroups  }}
+            - name: jgroups-fd
+              containerPort: {{ .Values.keycloak.StatefulSet.containers.ports.jgroupsfd }}
+          startupProbe:
+            httpGet:
+              path: /health/started
+              port: 9000
+            periodSeconds: 1
+            failureThreshold: 600              
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 9000
+            periodSeconds: 10
+            failureThreshold: 3              
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 9000
+            periodSeconds: 10
+            failureThreshold: 3              
+          resources:
+            limits:
+              cpu: {{ .Values.keycloak.StatefulSet.containers.limits.cpu }}
+              memory: {{ .Values.keycloak.StatefulSet.containers.limits.memory }}
+            requests:
+              cpu: {{ .Values.keycloak.StatefulSet.containers.requests.cpu }}
+              memory: {{ .Values.keycloak.StatefulSet.containers.limits.memory }}

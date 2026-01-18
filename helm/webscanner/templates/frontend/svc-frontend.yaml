@@ -8,6 +8,5 @@ spec:
   ports:
     - port: {{ .Values.frontend.service.port }}
       targetPort: {{ .Values.frontend.service.port }}
-      nodePort: {{ .Values.frontend.service.nodePort }}
   selector:
     app: {{ include "webscanner.frontendName" . }}
