@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  creationTimestamp: null
+  labels:
+    app: {{ include "webscanner.emailName" . }}
+  name: {{ include "webscanner.emailName" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ include "webscanner.emailName" . }}
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: {{ include "webscanner.emailName" . }}
+    spec:
+      containers:
+      - image: {{ .Values.email.image }}:{{ .Values.email.tag }}
+        name: {{ include "webscanner.emailName" . }}
+        resources: {}
+status: {}

@@ -1,0 +1,49 @@
+namespace: web-scanner-dev
+frontend:
+  replicas: 2
+  image:
+    repository: web-scan-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  nginx:
+    config: dev
+    containerPort: 4200
+  service:
+    type: NodePort
+    port: 4200
+    nodePort: 30001
+email:
+  replicas: 2
+  image: web-scan-email
+  tag: latest
+  service:
+    port: 8000
+    targetPort: 8000
+crawler:
+  replicas: 3
+  image: 
+    name: web-scan-crawler
+    tag: latest
+    imagePullPolicy: IfNotPresent
+  service:
+    port: 3000
+    targetPort: 30002
+maildev:
+  name: maildev
+  replicas: 1 
+  container:
+    image: maildev/maildev
+    tag: 2.1.0
+    limits:
+      memory: 512Mi
+      cpu: 100m
+    requests:
+      memory: 256
+      cpu: 50m
+  service:
+    web:
+      port: 1080
+      targetPort: 1080
+    smtp: 
+      port: 10255
+      targetPort: 1025

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  creationTimestamp: null
+  labels:
+    app: {{ include "webscanner.crawlerName" . }}
+  name: {{ include "webscanner.crawlerName" . }}
+spec:
+  replicas: {{ .Values.crawler.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "webscanner.crawlerName" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "webscanner.crawlerName" . }}
+    spec:
+      containers:
+      - image: {{ .Values.crawler.image.name }}:{{.Values.crawler.image.tag}}
+        name: {{ include "webscanner.crawlerName" . }}
+        imagePullPolicy: {{ .Values.crawler.image.imagePullPolicy }}
+        resources: {}

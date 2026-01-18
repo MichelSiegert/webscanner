@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.namespace }}
+  creationTimestamp: null
+  labels:
+    app: {{ include "webscanner.emailName" . }}
+    skaffold.dev/run-id: e03eb115-6872-46dd-941c-2a4ab1cd7350
+  name: {{ include "webscanner.emailName" . }}
+spec:
+  ports:
+  - port: {{ .Values.email.service.port}}
+    protocol: TCP
+    targetPort: {{ .Values.email.service.targetPort}}
+  selector:
+    app: {{ include "webscanner.emailName" . }}
+status:
+  loadBalancer: {}

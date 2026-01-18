@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.maildev.name }}
+  labels:
+    app: {{ .Values.maildev.name }}
+spec:
+  replicas: {{ .Values.maildev.replicas}}
+  selector:
+    matchLabels:
+      app: {{ .Values.maildev.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.maildev.name }}
+    spec:
+      containers:
+      - name: {{ .Values.maildev.name }}
+        image: {{ .Values.maildev.container.image}}:{{ .Values.maildev.container.tag }}
+        ports:
+        - containerPort: {{ .Values.maildev.service.web.port }}
+          name: web
+        - containerPort: {{ .Values.maildev.service.smtp.port }}
+          name: smtp
+        resources:
+          limits:
+            memory: {{ .Values.maildev.container.limits.memory }}
+            cpu: {{ .Values.maildev.container.limits.cpu }}
+          requests:
+            memory: {{ .Values.maildev.container.requests.memory }}
+            cpu: {{ .Values.maildev.container.requests.cpu }}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.maildev.name }}
+spec:
+  selector:
+    app: {{ .Values.maildev.name }}
+  ports:
+  - name: web
+    port: {{ .Values.maildev.service.web.port }}
+    targetPort: {{ .Values.maildev.service.web.targetPort }}
+  - name: smtp
+    port: {{ .Values.maildev.service.smtp.port }}
+    targetPort: {{ .Values.maildev.service.smtp.targetPort }}
+  type: ClusterIP

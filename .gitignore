@@ -4,3 +4,5 @@ package-lock.json
 angular-leaflet-example/
 .vscode/
 .angular/
+values.yaml
+values-dev.yaml

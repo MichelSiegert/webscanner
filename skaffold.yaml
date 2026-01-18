@@ -2,6 +2,7 @@ apiVersion: skaffold/v4beta13
 kind: Config
 metadata:
   name: webscanner
+
 build:
   artifacts:
     - image: web-scan-crawler
@@ -14,9 +15,42 @@ build:
         dockerfile: Dockerfile.dev
     - image: web-scan-email
       context: email
-      docker: 
+      docker:
         dockerfile: Dockerfile
-manifests:
-  kustomize:
-    paths:
-      - deployments
+
+deploy:
+  helm:
+    releases:
+      - name: webscanner
+        chartPath: helm/webscanner
+        valuesFiles:
+          - helm/webscanner/values-dev.yaml
+        setValueTemplates:
+          frontend.image.tag: "{{.IMAGE_TAG_web_scan_frontend}}"
+          frontend.image.repository: "{{.IMAGE_REPO_web_scan_frontend}}"
+
+profiles:
+  - name: prod
+    build:
+      local:
+        push: false
+      artifacts:
+        - image: web-scan-crawler
+          context: crawler
+          docker:
+            dockerfile: Dockerfile
+        - image: web-scan-frontend
+          context: frontend
+          docker:
+            dockerfile: Dockerfile
+        - image: web-scan-email
+          context: email
+          docker:
+            dockerfile: Dockerfile
+    deploy:
+      helm:
+        releases:
+          - name: webscanner
+            chartPath: helm/webscanner
+            valuesFiles:
+              - helm/webscanner/values.yaml

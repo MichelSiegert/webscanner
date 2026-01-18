@@ -1,6 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  namespace: {{ .Values.namespace }}
   name: email-ingress
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
@@ -13,6 +14,6 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: web-scan-email
+            name: {{ include "webscanner.emailName" . }}
             port:
-              number: 8000
+              number: {{ .Values.email.service.port}}
