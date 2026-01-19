@@ -1,20 +1,7 @@
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from .crypto import get_current_user
+from fastapi import FastAPI, Depends
 import smtplib
 from email.message import EmailMessage
-import httpx
-from jose import jwt, jwk, JWTError
-from jose.utils import base64url_decode
-from functools import lru_cache
-from typing import Optional
-import time
-
-KEYCLOAK_URL = "http://keycloak:8080" 
-REALM = "email-api"
-CLIENT_ID = "python-backend"
-
-ISSUER = f"{KEYCLOAK_URL}/realms/{REALM}"
-JWKS_URL = f"{ISSUER}/protocol/openid-connect/certs"
 
 app = FastAPI(
     title="Email API",
@@ -23,104 +10,85 @@ app = FastAPI(
     root_path="/email"
 )
 
-security = HTTPBearer(auto_error=False)
-
-_jwks_cache = {"keys": None, "fetched_at": 0}
-
-def get_jwks() -> dict:
-    """Fetch and cache Keycloak's public keys"""
-    if _jwks_cache["keys"] is None or time.time() - _jwks_cache["fetched_at"] > 300:
-        response = httpx.get(JWKS_URL, timeout=10)
-        response.raise_for_status()
-        _jwks_cache["keys"] = response.json()
-        _jwks_cache["fetched_at"] = time.time()
-    return _jwks_cache["keys"]
-
-
-def get_signing_key(token: str) -> dict:
-    """Find the correct key from JWKS to verify the token"""
-    jwks = get_jwks()
-    
-    header = jwt.get_unverified_header(token)
-    kid = header.get("kid")
-    
-    for key in jwks.get("keys", []):
-        if key.get("kid") == kid:
-            return key
-    
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Unable to find appropriate key"
-    )
-
-
-async def get_current_user(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
-) -> dict:
-    """Validate JWT token and return user info"""
-    
-    if credentials is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing authentication token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    token = credentials.credentials
-    
-    try:
-        signing_key = get_signing_key(token)
-        
-        payload = jwt.decode(
-            token,
-            signing_key,
-            algorithms=["RS256"],
-            audience="account",  
-            issuer=ISSUER,
-            options={
-                "verify_aud": False,
-                "verify_iss": True,
-                "verify_exp": True,
-            }
-        )
-        
-        return payload
-        
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except JWTError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token: {str(e)}",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-
-
 @app.get("/")
 def send_test_mail(
-    user: dict = Depends(get_current_user),
+    #user: dict = Depends(get_current_user),
     email: str = "michel@siegert.online",
     website: str = "https://michel.siegert.online"
 ):
     """Protected endpoint - requires valid JWT"""
     msg = EmailMessage()
-    msg.set_content(website)
-    msg["Subject"] = "testing mail"
+    msg["Subject"] = "Professionelle Website für Ihr Unternehmen - Erstberatung"
     msg["From"] = "sender@example.com"
     msg["To"] = email
+
+    text_content = """
+    Sehr geehrte Damen und Herren,
+
+    viele Kunden suchen heute online nach Dienstleistungen und treffen ihre Entscheidung oft basierend auf dem ersten Eindruck einer Website.
+    
+    Ich habe bemerkt, dass Ihr Unternehmen bisher noch keine eigene Website hat. Als erfahrener Web-Entwickler unterstütze ich Unternehmen dabei, online professionell sichtbar zu werden und neue Kunden zu gewinnen.
+
+    Über mich:
+    - 4 Jahre Erfahrung im Web Development
+    - Bachelor in Informatik
+    - Spezialisiert auf den Mittelstand und kleine Unternehmen
+
+    Gerne unterstütze ich Sie dabei, eine ansprechende Seite zu gestalten, die bei Google gut gefunden wird. Hätten Sie Interesse an einem kurzen, kostenlosen Beratungsgespräch?
+
+    Beste Grüße,
+
+    Michel Siegert
+    Waisenhofstraße 27, 24103 Kiel
+    Mobil: +49 177 8720796
+    Website: https://siegert.online/
+    """
+
+    html_content = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
+                <p>    Sehr geehrte Damen und Herren,</p>
+                
+                <p>viele Kunden suchen heute online nach Dienstleistungen. Dabei entscheidet oft der <strong>erste digitale Eindruck</strong> darüber, wer den Zuschlag erhält.</p>
+                
+                <p>Mir ist aufgefallen, dass Ihr Unternehmen aktuell noch nicht mit einer eigenen Website vertreten ist. Ich helfe Betrieben wie Ihrem dabei, diesen wichtigen Schritt zu gehen und professionell sichtbar zu werden.</p>
+                
+                <h3 style="color: #2c3e50;">Warum mit mir zusammenarbeiten?</h3>
+                <ul>
+                    <li><strong>Erfahrung:</strong> 4 Jahre Web Development & Bachelor in Informatik.</li>
+                    <li><strong>Fokus:</strong> Maßgeschneiderte Lösungen für kleine und mittelständische Unternehmen.</li>
+                    <li><strong>Sichtbarkeit:</strong> Optimierung für Google (SEO), damit Sie gefunden werden.</li>
+                </ul>
+
+                <p>Hätten Sie Zeit für ein kurzes, unverbindliches Beratungsgespräch?</p>
+
+                <p>Beste Grüße<br>
+                <strong>Michel Siegert</strong></p>
+                
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                
+                <div style="font-size: 0.85em; color: #777;">
+                    Waisenhofstraße 27, 24103 Kiel<br>
+                    Mobil: <a href="tel:+491778720796" style="color: #3498db;">+49 177 8720796</a><br>
+                    Web: <a href="https://siegert.online/" style="color: #3498db;">siegert.online</a><br>
+                </div>
+            </div>
+        </body>
+    </html>
+    """
+
+    msg.set_content(text_content)
+
+    msg.add_alternative(html_content, subtype='html')
     
     try:
-        with smtplib.SMTP("maildev", 1025) as server:
+        with smtplib.SMTP("maildev", 10255) as server:
             server.send_message(msg)
         return {
             "status": "success",
             "message": "message sent!",
-            "sent_by": user.get("preferred_username")
+            #"sent_by": user.get("preferred_username")
         }
     except Exception as e:
         return {"status": "error", "details": str(e)}
@@ -135,7 +103,7 @@ def health_check():
 @app.get("/me")
 def get_user_info(user: dict = Depends(get_current_user)):
     """Return current user's token claims"""
-    return {
+    return {    
         "username": user.get("preferred_username"),
         "email": user.get("email"),
         "roles": user.get("realm_access", {}).get("roles", []),
