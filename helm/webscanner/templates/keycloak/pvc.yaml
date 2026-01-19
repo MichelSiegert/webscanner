@@ -4,12 +4,8 @@ metadata:
   namespace: {{ .Values.namespace }}
   name: keycloak-storage
 spec:
-  storageClassName: manual
   accessModes:
-    - ReadWriteMany
-  volumeMode: Filesystem
+    - ReadWriteOnce
   resources:
     requests:
       storage: 5Gi
-    limits:
-      storage: 6Gi
