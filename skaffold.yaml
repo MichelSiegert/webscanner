@@ -23,6 +23,8 @@ deploy:
     releases:
       - name: webscanner
         chartPath: helm/webscanner
+        createNamespace: true
+        namespace: web-scanner-dev
         valuesFiles:
           - helm/webscanner/values-dev.yaml
         setValueTemplates:
@@ -52,5 +54,7 @@ profiles:
         releases:
           - name: webscanner
             chartPath: helm/webscanner
+            createNamespace: true
+            namespace: web-scanner-prod
             valuesFiles:
               - helm/webscanner/values.yaml
