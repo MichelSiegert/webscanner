@@ -113,6 +113,35 @@ triggerAction(customer: any) {
   });
 }
 
+sendMail(customer: any) {
+  console.log(customer, customer.mailSent);
+  if(customer.mailSent) return;
+  const updated = updateTree(
+    this.jsonReader.dataSource.value,
+    (node: TreeNode) => node.key === customer.name,
+    (node: TreeNode) => {
+      if (!node.children) return node;
+
+      return {
+        ...node,
+        children: node.children.map(child => {
+          if (child.key !== 'tags') return child;
+          let tagsNode = child;
+          tagsNode = upsertTag(tagsNode, "mailSent", "true");
+          return tagsNode
+        })
+      };
+    }
+  );
+  this.jsonReader.dataSource.next(updated)
+
+  customer.mailSent = true;
+  this.http.get(`/email?website=${customer.selectedWebsite}&email=${customer.selectedEmail}`)
+  .subscribe((result: any)=>{
+    console.log(result);
+  });
+}
+
 
 private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}): TreeNode {
   if (!node.children) return node;

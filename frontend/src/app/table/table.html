@@ -108,8 +108,8 @@
           }
         </button>
           <button
-            (click)="triggerAction(entry)"
-            [disabled]="true"
+            (click)="sendMail(entry)"
+            [disabled]="entry.mailSent || !entry.selectedWebsite || !entry.selectedEmail"
 
             class="bg-white
             text-blue-600
