@@ -21,4 +21,14 @@ spec:
       - image: {{ .Values.email.image }}:{{ .Values.email.tag }}
         name: {{ include "webscanner.emailName" . }}
         resources: {}
+        env:
+        - name: EMAIL
+          value: test@mail.com
+        - name: PASSWORD 
+          value: supersecret
+        - name: HOST
+          value: maildev 
+        - name: HOSTPORT
+          value: "10255"
+
 status: {}
