@@ -26,6 +26,8 @@ email:
     targetPort: 8000
 crawler:
   replicas: 3
+  env:
+    maxCrawl: 30
   image: 
     name: web-scan-crawler
     tag: 8050dd6559b3b57f17b4552b5e54fd27a43ced92c5872ae3631973bcf760aaf9

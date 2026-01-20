@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 const API_KEY = process.env.GOOGLE_API_KEY;
 const CSE_ID = process.env.GOOGLE_CSE_ID;

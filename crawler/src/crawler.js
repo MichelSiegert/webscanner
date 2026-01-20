@@ -1,13 +1,16 @@
 import * as cheerio from 'cheerio';
 import axios from 'axios';
 import fs from 'fs';
+import dotenv from "dotenv";
 
+dotenv.config();
+
+const maxCrawlLength = process.env.MAXCRAWL || 20;
 
 
 export async function crawlPages(targetUrl, emails= []) {
     let urlsToVisit = [targetUrl];
 
-    const maxCrawlLength = 20;
 
     let result = [...emails];
     let crawledCount = 0;

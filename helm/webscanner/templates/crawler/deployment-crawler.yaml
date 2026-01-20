@@ -21,3 +21,8 @@ spec:
         name: {{ include "webscanner.crawlerName" . }}
         imagePullPolicy: {{ .Values.crawler.image.imagePullPolicy }}
         resources: {}
+        env:
+        - name: MAXCRAWL
+          value: {{ .Values.crawler.env.maxCrawl | quote}}
+        - name: PORT
+          value: {{ .Values.crawler.service.port | quote }}
