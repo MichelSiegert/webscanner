@@ -33,7 +33,7 @@ def createHtml(website):
                 </p>
                 
                 <p>
-                    Mir ist aufgefallen, dass ihre Website {website} nicht mehr den Anforderungen einer Modernen Website entspricht. 
+                    Mir ist aufgefallen, dass ihre Website  <a href="{website}" style="color: #3498db;">{website}</a><br> nicht mehr den Anforderungen einer Modernen Website entspricht. 
                     Ich helfe Betrieben wie Ihrem dabei, diesen wichtigen Schritt zu gehen und professionell sichtbar zu werden.
                 </p>
                 
