@@ -15,7 +15,12 @@ frontend:
 email:
   replicas: 2
   image: web-scan-email
-  tag: latest
+  tag: 57297633ca6d509895558f1a17e14577fbadd8704a2ce6cea164750ea9a8c266
+  env:
+    email: "test@mail.com"
+    password: "supersecret"
+    host: "maildev"
+    hostPort: 10255
   service:
     port: 8000
     targetPort: 8000
@@ -47,3 +52,36 @@ maildev:
     smtp: 
       port: 10255
       targetPort: 1025
+
+keycloak:
+  postgres:
+    deployment:
+      name: postgres
+      replicas: 1 
+      user: keycloak
+      password: 3c5f345b-beb8-4f16-bb9a-6ddd62fa228e
+      db: wb-keycloak
+      logstatement: all
+      containerPort: 5432
+  StatefulSet:
+    name: keycloak
+    replicas: 2
+    containers:
+      env:
+        username: admin
+        password: 9621cd0c-3bca-4711-8b77-2c6003b6e9a3
+        headers: xforwarded
+        httpEnabled: true
+        strictHostname: false
+        healthEnabled: true
+        cache: ispn
+      ports:
+        http: 8080
+        jgroups: 7800
+        jgroupsfd: 57800
+      limits:
+        cpu: 2000m
+        memory: 2000Mi
+      requests:
+        cpu: 500m
+        memory: 1700Mi

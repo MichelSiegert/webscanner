@@ -49,6 +49,4 @@ export async function crawlPages(targetUrl, emails= []) {
     }
   }
   return result;
-
 }
-

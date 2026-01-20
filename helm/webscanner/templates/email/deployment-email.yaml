@@ -23,12 +23,12 @@ spec:
         resources: {}
         env:
         - name: EMAIL
-          value: test@mail.com
+          value: {{ Values.email.env.email }}
         - name: PASSWORD 
-          value: supersecret
+          value: {{ Values.email.env.password }}
         - name: HOST
-          value: maildev 
+          value: {{ Values.email.env.host }}
         - name: HOSTPORT
-          value: "10255"
+          value: {{ Values.email.env.hostPort }}
 
 status: {}
