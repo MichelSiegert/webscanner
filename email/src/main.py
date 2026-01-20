@@ -1,6 +1,6 @@
 import os
 from .crypto import get_current_user
-from .emailtext import html_content, text_content
+from .emailtext import createHtml, createText
 from fastapi import FastAPI, Depends
 import smtplib
 from email.message import EmailMessage
@@ -32,6 +32,9 @@ def send_test_mail(
     msg["Subject"] = "Professionelle Website für Ihr Unternehmen - Erstberatung"
     msg["From"] = "sender@example.com"
     msg["To"] = email
+
+    text_content = createText(website)
+    html_content = createHtml(website)
 
     msg.set_content(text_content)
 

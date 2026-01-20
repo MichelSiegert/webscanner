@@ -1,9 +1,10 @@
-text_content = f"""
+def createText(website):
+    return f"""
     Sehr geehrte Damen und Herren,
 
     viele Kunden suchen heute online nach Dienstleistungen und treffen ihre Entscheidung oft basierend auf dem ersten Eindruck einer Website.
     
-    Ich habe bemerkt, dass Ihr Unternehmen bisher noch keine eigene Website hat. Als erfahrener Web-Entwickler unterstütze ich Unternehmen dabei, online professionell sichtbar zu werden und neue Kunden zu gewinnen.
+    Ich habe bemerkt, dass ihre Website {website} nicht mehr den Anforderungen einer Modernen Website entspricht. Als erfahrener Web-Entwickler unterstütze ich Unternehmen dabei, online professionell sichtbar zu werden und neue Kunden zu gewinnen.
 
     Über mich:
     - 4 Jahre Erfahrung im Web Development
@@ -20,15 +21,21 @@ text_content = f"""
     Website: https://siegert.online/
     """
 
-html_content = f"""
+def createHtml(website):
+    return f"""
     <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: auto; border: 1px solid #eee; padding: 20px;">
-                <p>    Sehr geehrte Damen und Herren,</p>
+                <p> Sehr geehrte Damen und Herren,</p>
                 
-                <p>viele Kunden suchen heute online nach Dienstleistungen. Dabei entscheidet oft der <strong>erste digitale Eindruck</strong> darüber, wer den Zuschlag erhält.</p>
+                <p>
+                    viele Kunden suchen heute online nach Dienstleistungen. Dabei entscheidet oft der <strong>erste digitale Eindruck</strong> darüber, wer den Zuschlag erhält.
+                </p>
                 
-                <p>Mir ist aufgefallen, dass Ihr Unternehmen aktuell noch nicht mit einer eigenen Website vertreten ist. Ich helfe Betrieben wie Ihrem dabei, diesen wichtigen Schritt zu gehen und professionell sichtbar zu werden.</p>
+                <p>
+                    Mir ist aufgefallen, dass ihre Website {website} nicht mehr den Anforderungen einer Modernen Website entspricht. 
+                    Ich helfe Betrieben wie Ihrem dabei, diesen wichtigen Schritt zu gehen und professionell sichtbar zu werden.
+                </p>
                 
                 <h3 style="color: #2c3e50;">Warum mit mir zusammenarbeiten?</h3>
                 <ul>
