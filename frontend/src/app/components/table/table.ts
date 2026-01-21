@@ -42,6 +42,7 @@ export class Table implements OnInit{
   ngOnInit(): void {
     this.jsonReader.currentJSON.subscribe((e: Company[])=>{
       this.entries = e
+      this.applyFilter();
     });
 
     this.craftFilter.craftSource.subscribe((crafts) => {
@@ -68,6 +69,7 @@ triggerAction(company: Company) {
   company.crawlerState = CrawlerState.PENDING;
   this.http.get(`/api/search?company=${company.companyParams.name}&city=${company.companyParams.city}`)
   .subscribe((result:any)=>{
+    company.crawlerState = CrawlerState.SUCCESS;
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
     company.companyParams.website = links;
     company.companyParams.emails = result?.emails || [];
@@ -109,11 +111,11 @@ sendMail(company: Company) {
     );
     this.jsonReader.dataSource.next(updatedList);
 }
-  private updateEntry(company: Company){
+  private updateEntry(updatedCompany: Company){
     const updatedList = this.jsonReader.dataSource.value.map((c: Company) =>
-    company.companyParams.name === company.companyParams.name
-      ? company
-      : c
+      {
+        const isMatch = c.companyParams.name === updatedCompany.companyParams.name;
+        return isMatch ? updatedCompany : c;}
     );
     this.jsonReader.dataSource.next(updatedList)
   }
