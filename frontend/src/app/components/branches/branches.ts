@@ -3,7 +3,7 @@ import { JsonReaderService } from '../../services/json-reader';
 import { CommonModule } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { CraftFilter } from '../../services/craft-filter';
-import { TreeNode } from '../../types/TreeNode/TreeNode';
+import { Company } from '../../types/companies';
 
 @Component({
   selector: 'app-branches',
@@ -12,14 +12,14 @@ import { TreeNode } from '../../types/TreeNode/TreeNode';
   styleUrl: './branches.css'
 })
 export class Branches implements OnInit {
-  app: TreeNode[] = [];
+  app: Company[] = [];
   uniqueCrafts: string[] = [];
   selectedCrafts = new Set<string>();
 
   constructor(private jsonReaderService: JsonReaderService, private craftFilter: CraftFilter){}
 
   ngOnInit(): void {
-    this.jsonReaderService.dataSource.subscribe((data: TreeNode[])=>{
+    this.jsonReaderService.dataSource.subscribe((data: Company[])=>{
       this.app = data;
       this.uniqueCrafts = this.getUniqueCrafts(data);
     })
@@ -32,21 +32,8 @@ export class Branches implements OnInit {
     this.craftFilter.craftSource.next(this.selectedCrafts);
   }
 
-  getUniqueCrafts(data: TreeNode[]): string[]{
-    const crafts = new Set<string>();
-
-    data.forEach((item: TreeNode) => {
-      const tagsNode = item.children?.find(c => c.key === 'tags');
-      if (!tagsNode) return;
-
-      tagsNode.children?.forEach(tag => {
-        if (tag.key.startsWith('craft')) {
-          const craftValue = tag.value!.trim();
-          crafts.add(craftValue);
-        }
-      });
-    });
-
+  getUniqueCrafts(data: Company[]): string[]{
+    const crafts = new Set<string>( data.map((e: Company) => e.companyParams.craft ?? ""));
     return Array.from(crafts);
   }
 }

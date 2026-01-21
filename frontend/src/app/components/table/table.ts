@@ -4,7 +4,6 @@ import { JsonReaderService } from '../../services/json-reader';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CraftFilter } from '../../services/craft-filter';
-import { TreeNode, updateTree, upsertTag } from '../../types/TreeNode/TreeNode';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -12,6 +11,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Company } from '../../types/companies';
 import CrawlerState from  '../../types/crawlstate';
 import EmailState from '../../types/emailstate';
+
 @Component({
   selector: 'app-table',
   imports: [
@@ -40,12 +40,9 @@ export class Table implements OnInit{
 
   constructor(private jsonReader: JsonReaderService, private http: HttpClient, private craftFilter: CraftFilter) {}
   ngOnInit(): void {
-    this.jsonReader.currentJSON2.subscribe((e: Company[])=>{
+    this.jsonReader.currentJSON.subscribe((e: Company[])=>{
       this.entries = e
-
-
     });
-
 
     this.craftFilter.craftSource.subscribe((crafts) => {
       this.currentPageIndex= 0;
@@ -53,7 +50,6 @@ export class Table implements OnInit{
       this.applyFilter();
     });
   }
-
 
   updatePagination() {
     const startIndex = this.currentPageIndex * this.currentPageSize;
@@ -67,40 +63,27 @@ export class Table implements OnInit{
     this.updatePagination();
   }
 
-triggerAction(customer: any) {
-  if (customer.isAnalyzing) return;
-  customer.isAnalyzing = true;
-  this.http.get(`/api/search?company=${customer.name}&city=${customer.city}`)
+triggerAction(company: Company) {
+  if ([CrawlerState.PENDING, CrawlerState.SUCCESS].includes(company.crawlerState)) return;
+  company.crawlerState = CrawlerState.PENDING;
+  this.http.get(`/api/search?company=${company.companyParams.name}&city=${company.companyParams.city}`)
   .subscribe((result:any)=>{
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
-    customer.website = links.join(', ');
-
-    const website = links.join(', ');
-    const email = (result?.emails || []).join(", ");
-
-    const updated = updateTree(
-    this.jsonReader.dataSource.value,
-    (node: TreeNode) => node.key === customer.name,
-    node => {
-          const updatedNode = this.updateTagsInNode(node, {
-            isAnalyzing: 'false',
-            finishedAnalyzing: 'true',
-            email: email,
-            website: website
-          });
-          return updatedNode;
-        }
-  );
-  this.jsonReader.dataSource.next(updated)
+    company.companyParams.website = links;
+    company.companyParams.emails = result?.emails || [];
+    this.updateEntry(company);
   });
 }
 
-sendMail(customer: any) {
-  if(customer.mailSent2) return;
+sendMail(company: Company) {
+  if([EmailState.PENDING, EmailState.SUCCESS].includes(company.emailState)) return;
 
-  this.http.get(`/email?website=${customer.selectedWebsite}&email=${customer.selectedEmail}`)
+  this.http.get(`/email?website=${company.selectedWebsite}&email=${company.selectedEmail}`)
   .subscribe((result: any)=>{
-    if(result.status == 200) this.persistSelection(customer,"mailSent", "true");
+    if(result.status == 200) {
+      company.emailState = EmailState.SUCCESS;
+      this.updateEntry(company)
+    }
   });
 }
 
@@ -116,87 +99,22 @@ sendMail(customer: any) {
     this.updatePagination();
   }
 
-  private createEntries(data: any[]){
 
-    const tagsArray: any[] = data.map((customer: any)=>{return [... ((customer.children ?? [])).find((e:TreeNode)=> e.key ==="tags").children ?? []]});
-    const clearedTags = tagsArray.map((tags: TreeNode[]) => {
-      tags.map((tag: TreeNode)=>{
-      if (tag.key?.includes(":")) {
-        return {
-          ...tag,
-          key: tag.key.slice(tag.key.lastIndexOf(":") + 1)
-        };
-      }
-      return tag;
-      });
-      return tags;
-    });
+  persistSelection(company: Company, property: 'selectedEmail' | 'selectedWebsite', value: string) {
+    company[property] = value;
 
-    const formattedTags = clearedTags.map((customer:TreeNode[])=>{
-    const email = this.getValueOF(customer, "email") ?? [];
-
-    let website = this.getValueOF(customer, "website") || "";
-
-    if (website && !/^https?:\/\//i.test(website)) {
-        website = 'https://' + website;
-    }
-    const websiteUrls = website
-      ? website.split(',').map(w => w.trim()).filter(Boolean)
-      : [];
-    const selectedWebsite = this.getValueOF(customer, "selectedWebsite") || (websiteUrls[0] ?? null);
-    const selectedEmail = this.getValueOF(customer, "selectedEmail") || (email.split(", ")[0] ?? null);
-
-    const name = this.getValueOF(customer, "name");
-    const city = this.getValueOF(customer, "city");
-    const craft = this.getValueOF(customer, "craft");
-    const isAnalyzing = this.getValueOF(customer, "isAnalyzing") === 'true';
-    const finishedAnalyzing = this.getValueOF(customer, "finishedAnalyzing") === 'true';
-    const mailSent = this.getValueOF(customer, "mailSent")
-
-    return {email, selectedEmail, website, selectedWebsite, name, city, craft, isAnalyzing, finishedAnalyzing, mailSent};
-    });
-  return formattedTags;
-  }
-
-  private getValueOF(customer: any[], value: string): string{
-    return customer.find((e)=>e.key === value)?.value ?? "";
-  }
-
-  private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}): TreeNode {
-    if (!node.children) return node;
-    return {
-      ...node,
-      children: node.children.map(child => {
-        if (child.key !== 'tags') return child;
-        let tagsNode = child;
-        Object.keys(tagsToUpdate).forEach(key => {
-          if (tagsToUpdate[key]) {
-            tagsNode = upsertTag(tagsNode, key, tagsToUpdate[key]);
-          }
-        });
-        return tagsNode;
-      })
-    };
-  }
-
-persistSelection(customer: any, key: string, value: string) {
-  const updated = updateTree(
-    this.jsonReader.dataSource.value,
-    (node: TreeNode) => node.key === customer.name,
-    (node: TreeNode) => {
-      if (!node.children) return node;
-
-      return {
-        ...node,
-        children: node.children.map(child => {
-          if (child.key !== 'tags') return child;
-          let tagsNode = child;
-          tagsNode = upsertTag(tagsNode, key, value);
-          return tagsNode
-        })
-      };
-    }
-  );
-  this.jsonReader.dataSource.next(updated);
+    const currentCompanies = this.jsonReader.dataSource.value;
+    const updatedList = currentCompanies.map(c =>
+      c === company ? company : c
+    );
+    this.jsonReader.dataSource.next(updatedList);
 }
+  private updateEntry(company: Company){
+    const updatedList = this.jsonReader.dataSource.value.map((c: Company) =>
+    company.companyParams.name === company.companyParams.name
+      ? company
+      : c
+    );
+    this.jsonReader.dataSource.next(updatedList)
+  }
 }
