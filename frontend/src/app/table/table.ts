@@ -51,26 +51,6 @@ export class Table implements OnInit{
     });
   }
 
-  persistSelection(customer: any, key: string, value: string) {
-  const updated = updateTree(
-    this.jsonReader.dataSource.value,
-    (node: TreeNode) => node.key === customer.name,
-    (node: TreeNode) => {
-      if (!node.children) return node;
-
-      return {
-        ...node,
-        children: node.children.map(child => {
-          if (child.key !== 'tags') return child;
-          let tagsNode = child;
-          tagsNode = upsertTag(tagsNode, key, value);
-          return tagsNode
-        })
-      };
-    }
-  );
-  this.jsonReader.dataSource.next(updated);
-}
 
   updatePagination() {
     const startIndex = this.currentPageIndex * this.currentPageSize;
@@ -83,7 +63,6 @@ export class Table implements OnInit{
     this.currentPageIndex = event.pageIndex;
     this.updatePagination();
   }
-
 
 triggerAction(customer: any) {
   if (customer.isAnalyzing) return;
@@ -114,51 +93,14 @@ triggerAction(customer: any) {
 }
 
 sendMail(customer: any) {
-  console.log(customer, customer.mailSent);
-  if(customer.mailSent) return;
-  const updated = updateTree(
-    this.jsonReader.dataSource.value,
-    (node: TreeNode) => node.key === customer.name,
-    (node: TreeNode) => {
-      if (!node.children) return node;
+  console.log(customer);
+  if(customer.mailSent2) return;
 
-      return {
-        ...node,
-        children: node.children.map(child => {
-          if (child.key !== 'tags') return child;
-          let tagsNode = child;
-          tagsNode = upsertTag(tagsNode, "mailSent", "true");
-          return tagsNode
-        })
-      };
-    }
-  );
-  this.jsonReader.dataSource.next(updated)
-
-  customer.mailSent = true;
   this.http.get(`/email?website=${customer.selectedWebsite}&email=${customer.selectedEmail}`)
   .subscribe((result: any)=>{
-    console.log(result);
+    if(result.status == 200) this.persistSelection(customer,"mailSent", "true");
   });
 }
-
-
-private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}): TreeNode {
-  if (!node.children) return node;
-  return {
-    ...node,
-    children: node.children.map(child => {
-      if (child.key !== 'tags') return child;
-      let tagsNode = child;
-      Object.keys(tagsToUpdate).forEach(key => {
-        if (tagsToUpdate[key]) {
-          tagsNode = upsertTag(tagsNode, key, tagsToUpdate[key]);
-        }
-      });
-      return tagsNode;
-    })
-  };
-  }
 
   private applyFilter() {
     if (this.selectedCrafts.size === 0) {
@@ -171,7 +113,6 @@ private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}):
     this.currentPageIndex = 0;
     this.updatePagination();
   }
-
 
   private createEntries(data: any[]){
 
@@ -208,8 +149,9 @@ private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}):
     const craft = this.getValueOF(customer, "craft");
     const isAnalyzing = this.getValueOF(customer, "isAnalyzing") === 'true';
     const finishedAnalyzing = this.getValueOF(customer, "finishedAnalyzing") === 'true';
+    const mailSent = this.getValueOF(customer, "mailSent")
 
-    return {email, selectedEmail, website, selectedWebsite, name, city, craft, isAnalyzing, finishedAnalyzing};
+    return {email, selectedEmail, website, selectedWebsite, name, city, craft, isAnalyzing, finishedAnalyzing, mailSent};
     });
   return formattedTags;
   }
@@ -217,4 +159,42 @@ private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}):
   private getValueOF(customer: any[], value: string): string{
     return customer.find((e)=>e.key === value)?.value ?? "";
   }
+
+  private updateTagsInNode(node: TreeNode, tagsToUpdate: {[key: string]: string}): TreeNode {
+    if (!node.children) return node;
+    return {
+      ...node,
+      children: node.children.map(child => {
+        if (child.key !== 'tags') return child;
+        let tagsNode = child;
+        Object.keys(tagsToUpdate).forEach(key => {
+          if (tagsToUpdate[key]) {
+            tagsNode = upsertTag(tagsNode, key, tagsToUpdate[key]);
+          }
+        });
+        return tagsNode;
+      })
+    };
+  }
+
+persistSelection(customer: any, key: string, value: string) {
+  const updated = updateTree(
+    this.jsonReader.dataSource.value,
+    (node: TreeNode) => node.key === customer.name,
+    (node: TreeNode) => {
+      if (!node.children) return node;
+
+      return {
+        ...node,
+        children: node.children.map(child => {
+          if (child.key !== 'tags') return child;
+          let tagsNode = child;
+          tagsNode = upsertTag(tagsNode, key, value);
+          return tagsNode
+        })
+      };
+    }
+  );
+  this.jsonReader.dataSource.next(updated);
+}
 }

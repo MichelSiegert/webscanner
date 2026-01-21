@@ -44,7 +44,7 @@ def send_test_mail(
         with smtplib.SMTP(host, hostPort) as server:
             server.send_message(msg)
         return {
-            "status": "success",
+            "status": 200,
             "message": "message sent!",
             #"sent_by": user.get("preferred_username")
         }
