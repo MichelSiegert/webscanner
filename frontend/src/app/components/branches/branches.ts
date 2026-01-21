@@ -18,7 +18,6 @@ export class Branches implements OnInit {
 
   constructor(private jsonReaderService: JsonReaderService, private craftFilter: CraftFilter){}
 
-
   ngOnInit(): void {
     this.jsonReaderService.dataSource.subscribe((data: TreeNode[])=>{
       this.app = data;

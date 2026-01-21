@@ -1,11 +1,10 @@
-import { Component, Provider, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { MapComponent } from './components/map/map';
 import { MarkerService } from './services/marker';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
-import { BranchInput } from './components/branch-input/branch-input';
 import { Table } from './components/table/table';
 import { Branches } from "./components/branches/branches";
 
@@ -18,7 +17,6 @@ import { Branches } from "./components/branches/branches";
     MatFormFieldModule,
     MatInputModule,
     Table,
-    BranchInput,
     FormsModule,
     Branches],
   templateUrl: './app.html',

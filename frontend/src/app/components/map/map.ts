@@ -1,7 +1,5 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
-import { MarkerService } from '../../services/marker';
-import { BranchService } from '../../services/branch-service';
 import { JsonReaderService } from '../../services/json-reader';
 import { overpassService } from '../../services/overpass-service';
 import { CraftFilter } from '../../services/craft-filter';
@@ -36,7 +34,6 @@ export class MapComponent implements AfterViewInit {
 
   constructor(
     private craftFilter: CraftFilter,
-    private branchService: BranchService,
     private jsonReader: JsonReaderService,
     private handwerkerService : overpassService) {  }
 
@@ -97,10 +94,6 @@ export class MapComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.initMap();
     this.markerLayer.addTo(this.map!);
-
-    this.branchService.currentBranch.subscribe((newBranch :string)=>{
-      this.currrentbranch = newBranch;
-    });
 
     this.craftFilter.craftSource.subscribe((selectedCrafts: Set<string>) => {
       this.filterMarkers(selectedCrafts);

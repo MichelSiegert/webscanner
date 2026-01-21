@@ -27,3 +27,5 @@ spec:
               port: {{ .Values.frontend.service.port }}
             initialDelaySeconds: 5
             periodSeconds: 5
+            failureThreshold: 10
+
