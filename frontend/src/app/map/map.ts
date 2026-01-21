@@ -1,10 +1,10 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
-import { MarkerService } from '../marker';
-import { BranchService } from '../branch-service';
-import { JsonReaderService } from '../json-reader';
-import { overpassService } from '../overpass-service';
-import { CraftFilter } from '../craft-filter';
+import { MarkerService } from '../services/marker';
+import { BranchService } from '../services/branch-service';
+import { JsonReaderService } from '../services/json-reader';
+import { overpassService } from '../services/overpass-service';
+import { CraftFilter } from '../services/craft-filter';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';

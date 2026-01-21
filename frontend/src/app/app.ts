@@ -1,6 +1,6 @@
 import { Component, Provider, signal } from '@angular/core';
 import { MapComponent } from './map/map';
-import { MarkerService } from './marker';
+import { MarkerService } from './services/marker';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';

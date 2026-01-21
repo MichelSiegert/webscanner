@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { JsonReaderService } from '../json-reader';
+import { JsonReaderService } from '../services/json-reader';
 import { CommonModule } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { CraftFilter } from '../craft-filter';
+import { CraftFilter } from '../services/craft-filter';
 import { TreeNode } from '../../data/TreeNode';
 
 @Component({
