@@ -9,7 +9,9 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-
+import { Company } from '../../types/companies';
+import CrawlerState from  '../../types/crawlstate';
+import EmailState from '../../types/emailstate';
 @Component({
   selector: 'app-table',
   imports: [
@@ -26,20 +28,21 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 })
 export class Table implements OnInit{
 
-  public entries : any[]= [];
+  public entries : Company[]= [];
   public filteredEntries: any[] = [];
   public paginatedEntries: any[] = [];
   private currentPageSize = 5;
   public currentPageIndex = 0;
+  public CrawlerState = CrawlerState;
+  public EmailState = EmailState;
 
   private selectedCrafts: Set<string> = new Set();
 
   constructor(private jsonReader: JsonReaderService, private http: HttpClient, private craftFilter: CraftFilter) {}
   ngOnInit(): void {
-    this.jsonReader.currentJSON.subscribe((e:any)=>{
-      this.entries = this.createEntries(e);
+    this.jsonReader.currentJSON2.subscribe((e: Company[])=>{
+      this.entries = e
 
-      this.applyFilter();
 
     });
 
@@ -93,7 +96,6 @@ triggerAction(customer: any) {
 }
 
 sendMail(customer: any) {
-  console.log(customer);
   if(customer.mailSent2) return;
 
   this.http.get(`/email?website=${customer.selectedWebsite}&email=${customer.selectedEmail}`)
@@ -107,7 +109,7 @@ sendMail(customer: any) {
       this.filteredEntries = [...this.entries];
     } else {
       this.filteredEntries = this.entries.filter(entry =>
-        this.selectedCrafts.has(entry.craft.trim())
+        this.selectedCrafts.has(entry.companyParams.craft?.trim() ?? "")
       );
     }
     this.currentPageIndex = 0;

@@ -63,9 +63,7 @@ export class MapComponent implements AfterViewInit {
           const craft = place.tags.craft;
 
           if (!alreadyExists) {
-            const a = this.jsonReader.parseCompanyFromJSON(place);
-            console.log(a);
-            this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
+            this.jsonReader.parseCompanyFromJSON(place);
             const marker = L.marker([place.lat, place.lon]);
             this.allMarkers.push({ marker, craft });
             (marker as any).companyData = place;

@@ -12,9 +12,9 @@
       </tr>
     </thead>
     <tbody class="bg-white divide-y divide-gray-200">
-      <tr *ngFor="let entry of paginatedEntries">
-        <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.name.trim() || '-' }}</td>
-        <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.craft.trim() || '-' }}</td>
+      <tr *ngFor="let entry of entries">
+        <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.companyParams.name?.trim() || '-' }}</td>
+        <td class="px-6 whitespace-nowrap text-sm text-gray-900">{{ entry.companyParams.craft?.trim() || '-' }}</td>
 
         <td>
           <mat-form-field>
@@ -23,10 +23,10 @@
             <mat-select
               [(value)]="entry.selectedEmail"
               (selectionChange)="persistSelection(entry, 'selectedEmail', $event.value)"
-              [disabled]="!entry.email?.trim()"
+              [disabled]="!entry.companyParams.emails?.length"
             >
-              @if (entry.email?.trim()) {
-                @for (email of entry.email.split(', '); track email) {
+              @if (entry.companyParams.emails?.length) {
+                @for (email of entry.companyParams.emails; track email) {
                   <mat-option [value]="email">{{ email }}</mat-option>
                 }
               } @else {
@@ -52,7 +52,7 @@
              </div>
           }
         </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.city.trim() || '-' }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ entry.companyParams.city || "-" }}</td>
         <td>
           <mat-form-field>
             <mat-label>Website</mat-label>
@@ -60,10 +60,10 @@
             <mat-select
               [(value)]="entry.selectedWebsite"
               (selectionChange)="persistSelection(entry, 'selectedWebsite', $event.value)"
-              [disabled]="!entry.website?.trim()"
+              [disabled]="!entry.companyParams.website?.length"
             >
-              @if (entry.website?.trim()) {
-                @for (url of entry.website.split(', '); track url) {
+              @if (entry.companyParams.website?.length) {
+                @for (url of entry.companyParams.website; track url) {
                   <mat-option [value]="url">{{ url }}</mat-option>
                 }
               } @else {
@@ -92,12 +92,12 @@
         <td class="px-6 py-4 whitespace-nowrap text-center flex">
         <button
           (click)="triggerAction(entry)"
-          [disabled]="entry.isAnalyzing || entry.finishedAnalyzing"
+          [disabled]="[CrawlerState.SUCCESS || CrawlerState.PENDING ].includes(entry.crawlerState)"
           class="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300
                 text-white font-semibold py-1 px-3 rounded mr-5
                 flex items-center justify-center min-w-[120px]"
         >
-          @if (entry.isAnalyzing) {
+          @if (entry.crawlerState === CrawlerState.PENDING) {
             <mat-progress-spinner
               diameter="20"
               mode="indeterminate"
@@ -109,8 +109,7 @@
         </button>
           <button
             (click)="sendMail(entry)"
-            [disabled]="entry.mailSent || !entry.selectedWebsite || !entry.selectedEmail"
-
+            [disabled]="[EmailState.PENDING, EmailState.SUCCESS].includes(entry.emailState) || !entry.selectedWebsite || !entry.selectedEmail"
             class="bg-white
             text-blue-600
             border-blue-500
@@ -118,9 +117,7 @@
               py-1
               px-3
               rounded
-
               hover:bg-blue-300
-
               disabled:bg-gray-100
               disabled:text-gray-400
               disabled:border-gray-300
