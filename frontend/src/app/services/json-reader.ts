@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, max } from 'rxjs';
-import { TreeNode } from '../../data/TreeNode';
+import { TreeNode } from '../types/TreeNode/TreeNode';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +29,7 @@ export class JsonReaderService {
     nodeName: string = 'root',
     depth: number = 0,
     maxDepth: number = 3): TreeNode {
+
   if (data === null || data === undefined) {
     return { key: nodeName, value: null };
   }
@@ -57,16 +58,5 @@ export class JsonReaderService {
     value: null,
     children: children.length ? children : undefined
   };
-}
-
-  convertGeoJSONToTree(geojson: any): TreeNode[] {
-    if (!geojson.features) return [];
-
-    return geojson.features.map((feature: any, index: number) => ({
-      name: feature.properties.name || `Feature ${index + 1}`,
-      children: Object.entries(feature.properties)
-        .filter(([key]) => key !== 'name')
-        .map(([key, value]) => ({ name: `${key}: ${value}` }))
-    }));
   }
 }

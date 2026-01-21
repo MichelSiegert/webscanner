@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatInputModule } from "@angular/material/input";
-import { JsonReaderService } from '../services/json-reader';
+import { JsonReaderService } from '../../services/json-reader';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { CraftFilter } from '../services/craft-filter';
-import { TreeNode, updateTree, upsertTag } from '../../data/TreeNode';
+import { CraftFilter } from '../../services/craft-filter';
+import { TreeNode, updateTree, upsertTag } from '../../types/TreeNode/TreeNode';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { JsonReaderService } from '../services/json-reader';
+import { JsonReaderService } from '../../services/json-reader';
 import { CommonModule } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { CraftFilter } from '../services/craft-filter';
-import { TreeNode } from '../../data/TreeNode';
+import { CraftFilter } from '../../services/craft-filter';
+import { TreeNode } from '../../types/TreeNode/TreeNode';
 
 @Component({
   selector: 'app-branches',

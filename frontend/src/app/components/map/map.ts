@@ -1,10 +1,10 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
-import { MarkerService } from '../services/marker';
-import { BranchService } from '../services/branch-service';
-import { JsonReaderService } from '../services/json-reader';
-import { overpassService } from '../services/overpass-service';
-import { CraftFilter } from '../services/craft-filter';
+import { MarkerService } from '../../services/marker';
+import { BranchService } from '../../services/branch-service';
+import { JsonReaderService } from '../../services/json-reader';
+import { overpassService } from '../../services/overpass-service';
+import { CraftFilter } from '../../services/craft-filter';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -30,15 +30,12 @@ L.Marker.prototype.options.icon = iconDefault;
 export class MapComponent implements AfterViewInit {
   currrentbranch: string = "";
 
-
-
   private map: L.Map | undefined;
   private markerLayer = L.layerGroup();
   private allMarkers: { marker: L.Marker, craft: string }[] = [];
 
   constructor(
     private craftFilter: CraftFilter,
-    private marker : MarkerService,
     private branchService: BranchService,
     private jsonReader: JsonReaderService,
     private handwerkerService : overpassService) {  }
@@ -61,6 +58,7 @@ export class MapComponent implements AfterViewInit {
   this.map.on('click', async (e) => {
     const result = await this.handwerkerService.getNearbyCompanies(e.latlng.lat, e.latlng.lng);
     result.subscribe((places: any) => {
+      console.log(places);
       places.elements.forEach((place: any) => {
         if (place.lat && place.lon) {
           const alreadyExists = this.isMarkerAt(place.lat, place.lon);

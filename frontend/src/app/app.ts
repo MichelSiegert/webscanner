@@ -1,13 +1,13 @@
 import { Component, Provider, signal } from '@angular/core';
-import { MapComponent } from './map/map';
+import { MapComponent } from './components/map/map';
 import { MarkerService } from './services/marker';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
-import { BranchInput } from './branch-input/branch-input';
-import { Table } from './table/table';
-import { Branches } from "./branches/branches";
+import { BranchInput } from './components/branch-input/branch-input';
+import { Table } from './components/table/table';
+import { Branches } from "./components/branches/branches";
 
 @Component({
   selector: 'app-root',

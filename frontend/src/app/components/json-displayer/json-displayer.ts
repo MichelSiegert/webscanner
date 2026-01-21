@@ -4,8 +4,8 @@ import { MatTree, MatTreeNestedDataSource, MatTreeNode, MatTreeNodeDef } from '@
 import { MatTreeModule } from '@angular/material/tree';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule, MatIconButton } from '@angular/material/button';
-import { JsonReaderService } from '../services/json-reader';
-import { TreeNode } from '../../data/TreeNode';
+import { JsonReaderService } from '../../services/json-reader';
+import { TreeNode } from '../../types/TreeNode/TreeNode';
 
 @Component({
   selector: 'app-json-displayer',
