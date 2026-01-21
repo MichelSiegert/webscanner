@@ -59,13 +59,15 @@ export class MapComponent implements AfterViewInit {
     const result = await this.handwerkerService.getNearbyCompanies(e.latlng.lat, e.latlng.lng);
     result.subscribe((places: any) => {
       console.log(places);
+
       places.elements.forEach((place: any) => {
         if (place.lat && place.lon) {
           const alreadyExists = this.isMarkerAt(place.lat, place.lon);
           const craft = place.tags.craft;
 
           if (!alreadyExists) {
-
+            const a = this.jsonReader.parseCompanyFromJSON(place);
+            console.log(a);
             this.jsonReader.addLocaleToJson(place, place.tags.name, 10);
             const marker = L.marker([place.lat, place.lon]);
             this.allMarkers.push({ marker, craft });

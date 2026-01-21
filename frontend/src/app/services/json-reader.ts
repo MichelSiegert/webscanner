@@ -2,11 +2,26 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, max } from 'rxjs';
 import { TreeNode } from '../types/TreeNode/TreeNode';
+import { Company } from '../types/companies';
+import { CompanyParams } from '../types/companyparams';
+import { LatLng } from 'leaflet';
 
 @Injectable({
   providedIn: 'root'
 })
 export class JsonReaderService {
+  parseCompanyFromJSON(place: any) : Company{
+    const location = new LatLng(place.lat, place.lon)
+    const companyParams : CompanyParams = {
+      location: location,
+      name: place?.tags?.name ?? "",
+      city: place.tags?.["addr:city"] ?? "",
+      craft: place?.tags?.craft ?? "",
+      emails: place.tags.email? [place.tags.email]: [],
+      website: place.tags.website? [place.tags.website] : []
+    }
+    return new Company(companyParams);
+  }
   constructor(private http: HttpClient){}
   public dataSource = new BehaviorSubject<TreeNode[]>([]);
   currentJSON = this.dataSource.asObservable();
@@ -60,3 +75,5 @@ export class JsonReaderService {
   };
   }
 }
+
+
