@@ -14,7 +14,7 @@ export class CompanyMapperService {
   currentJSON: Observable<Company[]> = this.dataSource.asObservable();
 
 
-    parseCompanyFromJSON(place: any) : void{
+    parseCompanyFromJSON(place: any) : Company{
     const location = new LatLng(place.lat, place.lon)
     const companyParams : CompanyParams = {
       location: location,
@@ -25,9 +25,7 @@ export class CompanyMapperService {
       website: place.tags.website? [place.tags.website] : []
     }
     const company = new Company(companyParams);
-    const tmp = this.dataSource.value;
-    tmp.push(company);
-    this.dataSource.next(tmp);
+    return company;
   }
 }
 

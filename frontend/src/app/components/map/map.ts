@@ -1,8 +1,8 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
-import { CompanyMapperService } from '../../services/company-mapper-service';
-import { OverpassService } from '../../services/overpass-service';
 import { CraftFilterService } from '../../services/craft-filter-service';
+import { CompanyDataService } from '../../services/company-data-service';
+import { Company } from '../../types/companies';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -19,7 +19,6 @@ const iconDefault = L.icon({
 });
 L.Marker.prototype.options.icon = iconDefault;
 
-
 @Component({
   selector: 'app-map',
   templateUrl: './map.html',
@@ -34,9 +33,8 @@ export class MapComponent implements AfterViewInit {
 
   constructor(
     private craftFilterService: CraftFilterService,
-    private jsonReader: CompanyMapperService,
-    private overpassService : OverpassService) {  }
-
+    private companyDataService : CompanyDataService
+  ) {  }
 
   private initMap(): void {
     this.map = L.map('map', {
@@ -53,55 +51,49 @@ export class MapComponent implements AfterViewInit {
     tiles.addTo(this.map);
 
   this.map.on('click', async (e) => {
-    const result = this.overpassService.getNearbyCompanies(e.latlng.lat, e.latlng.lng);
-    result.subscribe((places: any) => {
-      places.elements.forEach((place: any) => {
-        if (place.lat && place.lon) {
-          const alreadyExists = this.isMarkerAt(place.lat, place.lon);
-          const craft = place.tags.craft;
-
-          if (!alreadyExists) {
-            this.jsonReader.parseCompanyFromJSON(place);
-            const marker = L.marker([place.lat, place.lon]);
-            this.allMarkers.push({ marker, craft });
-            (marker as any).companyData = place;
-
-            const currentFilter = this.craftFilterService.craftSource.value;
-            if (currentFilter.size === 0 || currentFilter.has(craft)) {
-              marker.addTo(this.markerLayer);
-            }
-          }
-        }
-      });
-    });
+    this.companyDataService.fetchCompanies(e.latlng.lat, e.latlng.lng);
     });
   }
 
-  isMarkerAt(lat: any, lon: any) {
-  let exists = false;
-  this.markerLayer.eachLayer((layer: any) => {
-    const pos = layer.getLatLng();
-    if (Math.abs(pos.lat - lat) < 0.0001 && Math.abs(pos.lng - lon) < 0.0001) {
-      exists = true;
-    }
-  });
-  return exists;
-  }
-
-  ngAfterViewInit(): void {
+ngAfterViewInit(): void {
     this.initMap();
     this.markerLayer.addTo(this.map!);
 
-    this.craftFilterService.craftSource.subscribe((selectedCrafts: Set<string>) => {
-      this.filterMarkers(selectedCrafts);
+    this.companyDataService.companies$.subscribe(companies => {
+        this.updateMarkers(companies);
     });
-  }
 
-  filterMarkers(selectedCrafts: Set<string>) {
+    this.craftFilterService.craftSource.subscribe(filter => {
+        this.applyFilter(filter);
+    });
+}
+
+  applyFilter(selectedCrafts: Set<string>) {
     this.markerLayer.clearLayers();
     this.allMarkers.forEach(item => {
       if (selectedCrafts.size === 0 || selectedCrafts.has(item.craft)) {
         item.marker.addTo(this.markerLayer);
+      }
+    });
+  }
+
+  isMarkerAt(location: L.LatLng) {
+  let exists = false;
+  this.markerLayer.eachLayer((layer: any) => {
+    const pos = layer.getLatLng();
+    if (Math.abs(pos.lat - location.lat) < 0.0001 && Math.abs(pos.lng - location.lng) < 0.0001) {
+      exists = true;
+    }
+    });
+    return exists;
+  }
+
+  private updateMarkers(companies: Company[]) {
+    companies.forEach((company: Company) => {
+      if (!this.isMarkerAt(company.companyParams.location)) {
+          const marker = L.marker([company.companyParams.location.lat, company.companyParams.location.lng]);
+          this.allMarkers.push({ marker, craft: company.companyParams.city ?? "" });
+          this.applyFilter(this.craftFilterService.craftSource.value);
       }
     });
   }

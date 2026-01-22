@@ -22,7 +22,7 @@
 
             <mat-select
               [(value)]="entry.selectedEmail"
-              (selectionChange)="persistSelection(entry, 'selectedEmail', $event.value)"
+              (selectionChange)="this.companyDataService.persistSelection(entry, 'selectedEmail', $event.value)"
               [disabled]="!entry.companyParams.emails?.length"
             >
               @if (entry.companyParams.emails?.length) {
@@ -59,7 +59,7 @@
 
             <mat-select
               [(value)]="entry.selectedWebsite"
-              (selectionChange)="persistSelection(entry, 'selectedWebsite', $event.value)"
+              (selectionChange)="this.companyDataService.persistSelection(entry, 'selectedWebsite', $event.value)"
               [disabled]="!entry.companyParams.website?.length"
             >
               @if (entry.companyParams.website?.length) {

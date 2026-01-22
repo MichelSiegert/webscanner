@@ -11,6 +11,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Company } from '../../types/companies';
 import CrawlerState from  '../../types/crawlstate';
 import EmailState from '../../types/emailstate';
+import { CompanyDataService } from '../../services/company-data-service';
 
 @Component({
   selector: 'app-table',
@@ -38,9 +39,9 @@ export class Table implements OnInit{
 
   private selectedCrafts: Set<string> = new Set();
 
-  constructor(private companyMapperService: CompanyMapperService, private http: HttpClient, private craftFilterService: CraftFilterService) {}
+  constructor(protected companyDataService: CompanyDataService, private http: HttpClient, private craftFilterService: CraftFilterService) {}
   ngOnInit(): void {
-    this.companyMapperService.currentJSON.subscribe((e: Company[])=>{
+    this.companyDataService.companies$.subscribe((e: Company[])=>{
       this.entries = e
       this.applyFilter();
     });
@@ -73,7 +74,7 @@ triggerAction(company: Company) {
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
     company.companyParams.website = links;
     company.companyParams.emails = result?.emails || [];
-    this.updateEntry(company);
+    this.companyDataService.updateEntry(company);
   });
 }
 
@@ -84,7 +85,7 @@ sendMail(company: Company) {
   .subscribe((result: any)=>{
     if(result.status == 200) {
       company.emailState = EmailState.SUCCESS;
-      this.updateEntry(company)
+      this.companyDataService.updateEntry(company);
     }
   });
 }
@@ -99,24 +100,5 @@ sendMail(company: Company) {
     }
     this.currentPageIndex = 0;
     this.updatePagination();
-  }
-
-
-  persistSelection(company: Company, property: 'selectedEmail' | 'selectedWebsite', value: string) {
-    company[property] = value;
-
-    const currentCompanies = this.companyMapperService.dataSource.value;
-    const updatedList = currentCompanies.map(c =>
-      c === company ? company : c
-    );
-    this.companyMapperService.dataSource.next(updatedList);
-}
-  private updateEntry(updatedCompany: Company){
-    const updatedList = this.companyMapperService.dataSource.value.map((c: Company) =>
-      {
-        const isMatch = c.companyParams.name === updatedCompany.companyParams.name;
-        return isMatch ? updatedCompany : c;}
-    );
-    this.companyMapperService.dataSource.next(updatedList)
   }
 }
