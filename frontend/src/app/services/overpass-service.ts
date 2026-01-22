@@ -3,12 +3,12 @@ import { Injectable } from '@angular/core';
 import { Observable, retry, throwError, timer } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
-export class overpassService {
+export class OverpassService {
   private overpassUrl = 'https://overpass-api.de/api/interpreter';
 
   constructor(private http: HttpClient) {}
 
-  async getNearbyCompanies(lat: number, lon: number, radius = 5000): Promise<Observable<any>> {
+  getNearbyCompanies(lat: number, lon: number, radius = 5000): Observable<any> {
     const branchFilter = '["craft"]';
 
     const query = `

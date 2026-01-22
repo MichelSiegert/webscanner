@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class CraftFilter {
+export class CraftFilterService {
     public craftSource = new BehaviorSubject<Set<string>>(new Set());
 
   changeToggles(selectedBranches: Set<string>){

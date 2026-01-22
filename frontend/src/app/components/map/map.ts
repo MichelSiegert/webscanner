@@ -1,8 +1,8 @@
 import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
-import { JsonReaderService } from '../../services/json-reader';
-import { overpassService } from '../../services/overpass-service';
-import { CraftFilter } from '../../services/craft-filter';
+import { CompanyMapperService } from '../../services/company-mapper-service';
+import { OverpassService } from '../../services/overpass-service';
+import { CraftFilterService } from '../../services/craft-filter-service';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -33,9 +33,9 @@ export class MapComponent implements AfterViewInit {
   private allMarkers: { marker: L.Marker, craft: string }[] = [];
 
   constructor(
-    private craftFilter: CraftFilter,
-    private jsonReader: JsonReaderService,
-    private handwerkerService : overpassService) {  }
+    private craftFilterService: CraftFilterService,
+    private jsonReader: CompanyMapperService,
+    private overpassService : OverpassService) {  }
 
 
   private initMap(): void {
@@ -53,10 +53,8 @@ export class MapComponent implements AfterViewInit {
     tiles.addTo(this.map);
 
   this.map.on('click', async (e) => {
-    const result = await this.handwerkerService.getNearbyCompanies(e.latlng.lat, e.latlng.lng);
+    const result = this.overpassService.getNearbyCompanies(e.latlng.lat, e.latlng.lng);
     result.subscribe((places: any) => {
-      console.log(places);
-
       places.elements.forEach((place: any) => {
         if (place.lat && place.lon) {
           const alreadyExists = this.isMarkerAt(place.lat, place.lon);
@@ -68,7 +66,7 @@ export class MapComponent implements AfterViewInit {
             this.allMarkers.push({ marker, craft });
             (marker as any).companyData = place;
 
-            const currentFilter = this.craftFilter.craftSource.value;
+            const currentFilter = this.craftFilterService.craftSource.value;
             if (currentFilter.size === 0 || currentFilter.has(craft)) {
               marker.addTo(this.markerLayer);
             }
@@ -76,8 +74,9 @@ export class MapComponent implements AfterViewInit {
         }
       });
     });
-});
-}
+    });
+  }
+
   isMarkerAt(lat: any, lon: any) {
   let exists = false;
   this.markerLayer.eachLayer((layer: any) => {
@@ -86,17 +85,18 @@ export class MapComponent implements AfterViewInit {
       exists = true;
     }
   });
-  return exists;  }
-
+  return exists;
+  }
 
   ngAfterViewInit(): void {
     this.initMap();
     this.markerLayer.addTo(this.map!);
 
-    this.craftFilter.craftSource.subscribe((selectedCrafts: Set<string>) => {
+    this.craftFilterService.craftSource.subscribe((selectedCrafts: Set<string>) => {
       this.filterMarkers(selectedCrafts);
     });
   }
+
   filterMarkers(selectedCrafts: Set<string>) {
     this.markerLayer.clearLayers();
     this.allMarkers.forEach(item => {
@@ -105,6 +105,4 @@ export class MapComponent implements AfterViewInit {
       }
     });
   }
-
-
 }

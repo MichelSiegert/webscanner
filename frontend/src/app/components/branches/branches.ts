@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { JsonReaderService } from '../../services/json-reader';
+import { CompanyMapperService } from '../../services/company-mapper-service';
 import { CommonModule } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { CraftFilter } from '../../services/craft-filter';
+import { CraftFilterService } from '../../services/craft-filter-service';
 import { Company } from '../../types/companies';
 
 @Component({
@@ -16,10 +16,10 @@ export class Branches implements OnInit {
   uniqueCrafts: string[] = [];
   selectedCrafts = new Set<string>();
 
-  constructor(private jsonReaderService: JsonReaderService, private craftFilter: CraftFilter){}
+  constructor(private companyMapperService: CompanyMapperService, private craftFilterService: CraftFilterService){}
 
   ngOnInit(): void {
-    this.jsonReaderService.dataSource.subscribe((data: Company[])=>{
+    this.companyMapperService.dataSource.subscribe((data: Company[])=>{
       this.app = data;
       this.uniqueCrafts = this.getUniqueCrafts(data);
     })
@@ -29,7 +29,7 @@ export class Branches implements OnInit {
     checked
       ? this.selectedCrafts.add(craft)
       : this.selectedCrafts.delete(craft);
-    this.craftFilter.craftSource.next(this.selectedCrafts);
+    this.craftFilterService.craftSource.next(this.selectedCrafts);
   }
 
   getUniqueCrafts(data: Company[]): string[]{

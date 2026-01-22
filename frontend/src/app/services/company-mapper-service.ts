@@ -1,6 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, max, Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Company } from '../types/companies';
 import { CompanyParams } from '../types/companyparams';
 import { LatLng } from 'leaflet';
@@ -8,7 +7,7 @@ import { LatLng } from 'leaflet';
 @Injectable({
   providedIn: 'root'
 })
-export class JsonReaderService {
+export class CompanyMapperService {
 
 
   public dataSource = new BehaviorSubject<Company[]>([]);

@@ -14,6 +14,8 @@ const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.GOOGLE_API_KEY;
 const CSE_ID = process.env.GOOGLE_CSE_ID;
 
+app.get("/healz"), (req,res)=> {res.json({status: 200})}
+
 app.get("/search", async (req, res) => {
   const { company, city } = req.query;
 

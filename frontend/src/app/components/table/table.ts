@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatInputModule } from "@angular/material/input";
-import { JsonReaderService } from '../../services/json-reader';
+import { CompanyMapperService } from '../../services/company-mapper-service';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { CraftFilter } from '../../services/craft-filter';
+import { CraftFilterService } from '../../services/craft-filter-service';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -38,14 +38,14 @@ export class Table implements OnInit{
 
   private selectedCrafts: Set<string> = new Set();
 
-  constructor(private jsonReader: JsonReaderService, private http: HttpClient, private craftFilter: CraftFilter) {}
+  constructor(private companyMapperService: CompanyMapperService, private http: HttpClient, private craftFilterService: CraftFilterService) {}
   ngOnInit(): void {
-    this.jsonReader.currentJSON.subscribe((e: Company[])=>{
+    this.companyMapperService.currentJSON.subscribe((e: Company[])=>{
       this.entries = e
       this.applyFilter();
     });
 
-    this.craftFilter.craftSource.subscribe((crafts) => {
+    this.craftFilterService.craftSource.subscribe((crafts) => {
       this.currentPageIndex= 0;
       this.selectedCrafts = crafts;
       this.applyFilter();
@@ -105,18 +105,18 @@ sendMail(company: Company) {
   persistSelection(company: Company, property: 'selectedEmail' | 'selectedWebsite', value: string) {
     company[property] = value;
 
-    const currentCompanies = this.jsonReader.dataSource.value;
+    const currentCompanies = this.companyMapperService.dataSource.value;
     const updatedList = currentCompanies.map(c =>
       c === company ? company : c
     );
-    this.jsonReader.dataSource.next(updatedList);
+    this.companyMapperService.dataSource.next(updatedList);
 }
   private updateEntry(updatedCompany: Company){
-    const updatedList = this.jsonReader.dataSource.value.map((c: Company) =>
+    const updatedList = this.companyMapperService.dataSource.value.map((c: Company) =>
       {
         const isMatch = c.companyParams.name === updatedCompany.companyParams.name;
         return isMatch ? updatedCompany : c;}
     );
-    this.jsonReader.dataSource.next(updatedList)
+    this.companyMapperService.dataSource.next(updatedList)
   }
 }

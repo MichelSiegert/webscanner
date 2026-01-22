@@ -25,4 +25,4 @@ spec:
         - name: MAXCRAWL
           value: {{ .Values.crawler.env.maxCrawl | quote}}
         - name: PORT
-          value: {{ .Values.crawler.service.port | quote }}
+          value: {{ .Values.crawler.service.targetPort | quote }}

@@ -104,28 +104,29 @@
               color="white">
             </mat-progress-spinner>
           } @else {
-            Web Analyse
+            Collect Data
           }
         </button>
-          <button
-            (click)="sendMail(entry)"
-            [disabled]="[EmailState.PENDING, EmailState.SUCCESS].includes(entry.emailState) || !entry.selectedWebsite || !entry.selectedEmail"
-            class="bg-white
-            text-blue-600
-            border-blue-500
-              font-semibold
-              py-1
-              px-3
-              rounded
-              hover:bg-blue-300
-              disabled:bg-gray-100
-              disabled:text-gray-400
-              disabled:border-gray-300
-                disabled:cursor-not-allowed
-              disabled:hover:bg-gray-100"
-          >
-            Email senden
-          </button>
+        <button
+          (click)="sendMail(entry)"
+          [disabled]="[EmailState.PENDING, EmailState.SUCCESS].includes(entry.emailState) || !entry.selectedWebsite || !entry.selectedEmail"
+          class="bg-white
+                text-blue-600
+                border border-blue-600
+                font-semibold
+                py-1
+                px-3
+                rounded
+                transition-colors
+                duration-200
+                hover:bg-blue-50
+                disabled:bg-gray-100
+                disabled:text-gray-400
+                disabled:border-gray-300
+                disabled:cursor-not-allowed"
+        >
+          Send Mail
+        </button>
         </td>
       </tr>
     </tbody>
