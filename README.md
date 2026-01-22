@@ -8,22 +8,23 @@ If none are found we enrich the data trhough queries.
 Choices will be remembered an an email can be sent to customer if they wish to get in touch to improve their websites.
 I also want to make some more analysis on this, as i manually have to look at websites right now. 
 
-This Project uses:
+This Project uses following services(names are subject to change):
 
-- frontend: an Angular application deployed with nginx.
-- email: A FastAPI endpoint to sent mails to pot. customers
-- crawler: a tool to crawl websites of customers.
+- Frontend: an Angular application deployed with nginx.
+- Email: A FastAPI endpoint to sent mails to pot. customers
+- Crawler: a tool to crawl websites of customers.
+- Keycloak: for Auth
 
 For deployments I use a combination of Helm and skaffold to make deploying and testing easier.
 
 ## Setup
+Note I run this for tests locally using Kind. I am not sure how it is going to work for other setups.
 
-you have to run the following command:
+you have to run the following command to have the values for the dev environment for helm:
 `cp /helm/webscanner/values-dev.yaml.example /helm/webscanner/values-dev.yaml`
 then, if you run:
 `skaffold dev`
 the project should set itself up.
 
-(Maildev is to verify if the connection works )
-to reach maildev you have to add to your /etc/hosts:
-[NODE IP] maildev.local
+to Debug Mails, I use Maildev. 
+I created an ingress for maildev @maildev.local that you have to forward to the node ip if you want to use it (other ways are obviousl fine as well.
