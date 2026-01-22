@@ -27,7 +27,9 @@ email:
 crawler:
   replicas: 3
   env:
-    maxCrawl: 30
+      maxCrawl: 30
+      GOOGLE_CSE_ID:
+      GOOGLE_API_KEY:
   image: 
     name: web-scan-crawler
     tag: 8050dd6559b3b57f17b4552b5e54fd27a43ced92c5872ae3631973bcf760aaf9

@@ -28,6 +28,8 @@ crawler:
   replicas: 3
   env:
       maxCrawl: 30
+      GOOGLE_CSE_ID:
+      GOOGLE_API_KEY:
   image: 
     name: web-scan-crawler
     tag: latest

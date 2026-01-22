@@ -1,4 +1,5 @@
 # About
+
 ![example screenshot](image.png)
 This is a weekend project to find small and medium-sized businesses that have a website but whose site no longer meets today’s standards.
 It was implemented with Node and Angular.
@@ -18,7 +19,18 @@ This Project uses following services(names are subject to change):
 For deployments I use a combination of Helm and skaffold to make deploying and testing easier.
 
 ## Setup
+
 Note I run this for tests locally using Kind. I am not sure how it is going to work for other setups.
+
+Inside the helm value examples are variables 
+
+``` yaml
+      GOOGLE_CSE_ID: SOMEID
+      GOOGLE_API_KEY: SOMEKEY
+```
+
+Which are not set. you must create them yourself, since the current workflow is find companies -> search for their website (via google) -> crawl their pages.
+
 
 you have to run the following command to have the values for the dev environment for helm:
 `cp /helm/webscanner/values-dev.yaml.example /helm/webscanner/values-dev.yaml`
