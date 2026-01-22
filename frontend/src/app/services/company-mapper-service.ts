@@ -9,11 +9,6 @@ import { LatLng } from 'leaflet';
 })
 export class CompanyMapperService {
 
-
-  public dataSource = new BehaviorSubject<Company[]>([]);
-  currentJSON: Observable<Company[]> = this.dataSource.asObservable();
-
-
     parseCompanyFromJSON(place: any) : Company{
     const location = new LatLng(place.lat, place.lon)
     const companyParams : CompanyParams = {

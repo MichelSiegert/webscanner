@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { CraftFilterService } from '../../services/craft-filter-service';
 import { Company } from '../../types/companies';
+import { CompanyDataService } from '../../services/company-data-service';
 
 @Component({
   selector: 'app-branches',
@@ -16,10 +17,10 @@ export class Branches implements OnInit {
   uniqueCrafts: string[] = [];
   selectedCrafts = new Set<string>();
 
-  constructor(private companyMapperService: CompanyMapperService, private craftFilterService: CraftFilterService){}
+  constructor(private companyDataService: CompanyDataService, private craftFilterService: CraftFilterService){}
 
   ngOnInit(): void {
-    this.companyMapperService.dataSource.subscribe((data: Company[])=>{
+    this.companyDataService.companies$.subscribe((data: Company[])=>{
       this.app = data;
       this.uniqueCrafts = this.getUniqueCrafts(data);
     })
