@@ -26,3 +26,16 @@ spec:
           value: {{ .Values.crawler.env.maxCrawl | quote}}
         - name: PORT
           value: {{ .Values.crawler.service.targetPort | quote }}
+        readinessProbe:
+          httpGet:
+            path: /healz
+            port: {{ .Values.crawler.service.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 10
+        livenessProbe:
+          httpGet:
+            path: /healz
+            port: {{ .Values.crawler.service.targetPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 5

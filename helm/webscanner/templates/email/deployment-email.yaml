@@ -7,11 +7,10 @@ metadata:
     app: {{ include "webscanner.emailName" . }}
   name: {{ include "webscanner.emailName" . }}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: {{ include "webscanner.emailName" . }}
-  strategy: {}
   template:
     metadata:
       labels:
@@ -20,7 +19,6 @@ spec:
       containers:
       - image: {{ .Values.email.image }}:{{ .Values.email.tag }}
         name: {{ include "webscanner.emailName" . }}
-        resources: {}
         env:
         - name: EMAIL
           value: {{ .Values.email.env.email }}
@@ -30,5 +28,16 @@ spec:
           value: {{ .Values.email.env.host }}
         - name: HOSTPORT
           value: {{ .Values.email.env.hostPort | quote }}
-
-status: {}
+        readinessProbe:
+          httpGet:
+            path: /healz
+            port: {{ .Values.email.service.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 10
+        livenessProbe:
+          httpGet:
+            path: /healz
+            port: {{ .Values.email.service.targetPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 5
