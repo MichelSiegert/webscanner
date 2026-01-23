@@ -92,7 +92,7 @@ ngAfterViewInit(): void {
     companies.forEach((company: Company) => {
       if (!this.isMarkerAt(company.companyParams.location)) {
           const marker = L.marker([company.companyParams.location.lat, company.companyParams.location.lng]);
-          this.allMarkers.push({ marker, craft: company.companyParams.city ?? "" });
+          this.allMarkers.push({ marker, craft: company.companyParams.craft ?? "" });
           this.applyFilter(this.craftFilterService.craftSource.value);
       }
     });
