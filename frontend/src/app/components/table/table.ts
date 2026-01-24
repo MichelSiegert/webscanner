@@ -72,8 +72,11 @@ triggerAction(company: Company) {
   .subscribe((result:any)=>{
     company.crawlerState = CrawlerState.SUCCESS;
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
-    company.companyParams.website = links;
+    company.companyParams.website = links ?? [];
+    if(company.companyParams.website!.length)company.selectedWebsite = company.companyParams.website![0];
     company.companyParams.emails = result?.emails || [];
+    if(company.companyParams.emails!.length)company.selectedEmail= company.companyParams.emails![0]
+
     this.companyDataService.updateEntry(company);
   });
 }

@@ -14,7 +14,7 @@ export class CompanyDataService {
       private mapper: CompanyMapperService,
     ) {}
 
-    public fetchCompanies(lat: number, lng: number) {
+    public fetchCompanies(lat: number, lng: number): void {
         this.overpassService.getNearbyCompanies(lat, lng).subscribe((places: any) => {
             const currentCompanies = this.dataSource.value;
 
