@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-migration-script
+  namespace: {{ .Values.namespace }}
+data:
+  setup.sql: |
+    DO $$
+    BEGIN
+        IF NOT EXISTS (SELECT FROM pg_catalog.pg_user WHERE usename = '{{ .Values.orm.dbUser }}') THEN
+            CREATE USER {{ .Values.orm.dbUser }} WITH PASSWORD '{{ .Values.orm.dbPassword }}';
+        END IF;
+    END
+    $$;
+
+    SELECT 'CREATE DATABASE {{ .Values.orm.dbName }}'
+    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ .Values.orm.dbName }}')\gexec
+
+    GRANT ALL PRIVILEGES ON DATABASE {{ .Values.orm.dbName }} TO {{ .Values.orm.dbUser }};
