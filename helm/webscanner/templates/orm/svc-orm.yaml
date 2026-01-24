@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ include "webscanner.ormName" . }}
+    app.kubernetes.io/managed-by: Helm
+    skaffold.dev/run-id: 1e293987-707f-422e-8808-8e4b9a56a1dc
+  name: {{ include "webscanner.ormName" . }}
+  namespace: {{ .Values.namespace }}
+spec:
+  ports:
+  - port: {{ .Values.orm.port }}
+    protocol: TCP
+    targetPort: {{ .Values.orm.targetPort }}
+  selector:
+    app: {{ include "webscanner.ormName" . }}
+status:
+  loadBalancer: {}

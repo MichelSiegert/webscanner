@@ -11,13 +11,13 @@ spec:
         image: mirror.gcr.io/postgres:17
         env:
         - name: PGPASSWORD
-          value: {{ .Values.keycloak.postgres.deployment.password }}
+          value: {{ .Values.postgres.deployment.password }}
         command:
         - /bin/sh
         - -c
         - |
-          psql -h {{ .Values.keycloak.postgres.deployment.name }} \
-               -U {{ .Values.keycloak.postgres.deployment.user }} \
+          psql -h {{ .Values.postgres.deployment.name }} \
+               -U {{ .Values.postgres.deployment.user }} \
                -d postgres \
                -f /scripts/setup.sql
         volumeMounts:

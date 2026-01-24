@@ -58,22 +58,13 @@ maildev:
       targetPort: 1025
 
 keycloak:
-  postgres:
-    deployment:
-      name: postgres
-      replicas: 1 
-      user: keycloak
-      password: 9621cd0c-3bca-4711-8b77-2c6003b6e9a3
-      db: wb-keycloak
-      logstatement: all
-      containerPort: 5432
   StatefulSet:
     name: keycloak
     replicas: 2
     containers:
       env:
         username: admin
-        password: 3222345b-bebc-4f1f-b09a-6d0d62fa228e
+        password: 9621cd0c-3bca-4711-8b77-2c6003b6e9a3
         headers: xforwarded
         httpEnabled: true
         strictHostname: false
@@ -89,3 +80,21 @@ keycloak:
       requests:
         cpu: 500m
         memory: 1700Mi
+postgres:
+  deployment:
+    name: postgres
+    replicas: 1 
+    user: keycloak
+    password: 96b72d0c-3bca-4711-8b77-2c6003b7e9a3
+    db: wb-keycloak
+    logstatement: all
+    port: 5432
+    targetPort: 5432
+orm:
+  dbUser: ormuser
+  dbPassword: 0rmu5RPw4ca28b112cc03fb123fc
+  dbName: ormdb
+  dbUrl: postgresql://ormuser:0rmu5RPw4ca28b112cc03fb123fc@postgres:5432/ormdb
+  targetPort: 8001
+  port: 20001
+  

@@ -17,3 +17,7 @@ data:
     WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ .Values.orm.dbName }}')\gexec
 
     GRANT ALL PRIVILEGES ON DATABASE {{ .Values.orm.dbName }} TO {{ .Values.orm.dbUser }};
+    
+    \c ormdb
+    GRANT ALL ON SCHEMA public TO ormuser;
+    GRANT CREATE ON SCHEMA public TO ormuser;

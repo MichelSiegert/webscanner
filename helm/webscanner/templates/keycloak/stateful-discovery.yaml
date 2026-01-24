@@ -55,16 +55,16 @@ spec:
             - name: KC_CACHE_EMBEDDED_NETWORK_BIND_ADDRESS
               value: '$(POD_IP)'
             - name: 'KC_DB_URL_DATABASE'
-              value: {{ .Values.keycloak.postgres.deployment.db }}
+              value: {{ .Values.postgres.deployment.db }}
             - name: 'KC_DB_URL_HOST'
-              value: {{ .Values.keycloak.postgres.deployment.name }}
+              value: {{ .Values.postgres.deployment.name }}
             - name: 'KC_DB'
               value: postgres
             # In a production environment, use a secret to store username and password to the database
             - name: 'KC_DB_PASSWORD'
-              value: {{ .Values.keycloak.postgres.deployment.password }}
+              value: {{ .Values.postgres.deployment.password }}
             - name: 'KC_DB_USERNAME'
-              value: {{ .Values.keycloak.postgres.deployment.user }}
+              value: {{ .Values.postgres.deployment.user }}
           ports:
             - name: http
               containerPort: {{ .Values.keycloak.StatefulSet.containers.ports.http }}

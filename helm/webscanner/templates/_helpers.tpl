@@ -14,4 +14,8 @@ webscanner
 {{ include "webscanner.name" . }}-crawler
 {{- end -}}
 
+{{- define "webscanner.ormName" -}}
+{{ include "webscanner.name" . }}-orm
+{{- end -}}
+
 

@@ -17,6 +17,10 @@ build:
       context: email
       docker:
         dockerfile: Dockerfile
+    - image: web-scan-orm
+      context: orm
+      docker:
+        dockerfile: Dockerfile
 
 deploy:
   helm:

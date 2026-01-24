@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: {{ include "webscanner.ormName" . }}
+  name: {{ include "webscanner.ormName" . }}
+  namespace: web-scanner-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ include "webscanner.ormName" . }}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ include "webscanner.ormName" . }}
+    spec:
+      serviceAccountName: job-watcher
+      initContainers:
+        - name: job-waiter
+          image: bitnami/kubectl:latest
+          command:
+          - /bin/sh
+          - -c
+          - |
+            until [ "$(kubectl get job setup-python-db-job -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')" == "True" ]; do
+              echo "db needs to be setup"
+              sleep 5
+            done
+            echo "Db is now set up!"
+      containers:
+      - image: web-scan-orm
+        name: {{ include "webscanner.ormName" . }}
+        env:
+        - name: DATABASE_URL
+          value: {{ .Values.orm.dbUrl }}
+        - name: PORT
+          value: {{ .Values.orm.targetPort | quote }}
+        ports:
+          - containerPort: {{ .Values.orm.targetPort }}
+        livenessProbe:
+          httpGet:
+            path: /healz
+            port: {{ .Values.orm.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healz
+            port: {{ .Values.orm.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
