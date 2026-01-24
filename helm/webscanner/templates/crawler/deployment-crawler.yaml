@@ -29,7 +29,7 @@ spec:
         - name: GOOGLE_CSE_ID
           value: {{ .Values.crawler.env.GOOGLE_CSE_ID }}
         - name: GOOGLE_API_KEY
-          value: {{ .Values.crawler.service.GOOGLE_API_KEY }}
+          value: {{ .Values.crawler.env.GOOGLE_API_KEY }}
         readinessProbe:
           httpGet:
             path: /healz
