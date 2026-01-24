@@ -1,31 +1,30 @@
 import * as cheerio from 'cheerio';
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import fs from 'fs';
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const maxCrawlLength = process.env.MAXCRAWL || 20;
+const maxCrawlLength: number = +(process.env.MAXCRAWL || 20);
 
 
-export async function crawlPages(targetUrl, emails= []) {
-    let urlsToVisit = [targetUrl];
+export async function crawlPages(targetUrl: string, emails: string[]= []) {
+    let urlsToVisit: string[] = [targetUrl];
 
 
-    let result = [...emails];
-    let crawledCount = 0;
-    const pagePattern = /page\/\d+/i;
+    let result : string[]= [...emails];
+    let crawledCount: number = 0;
 
     while (urlsToVisit.length > 0 && crawledCount <= maxCrawlLength) {
-        const currentUrl = urlsToVisit.shift();
+        const currentUrl: string = urlsToVisit.shift()!;
         crawledCount++;
 
         try {
-        const response = await axios.get(currentUrl);
-        const cheerioApi = cheerio.load(response.data);
+        const response: AxiosResponse<any, any, {}>= await axios.get(currentUrl);
+        const cheerioApi: cheerio.CheerioAPI = cheerio.load(response.data);
 
-        cheerioApi('a[href]').each((_, element) => {
-        let url = cheerioApi(element).attr('href');
+        cheerioApi('a[href]').each((_, element: any) => {
+        let url: string = cheerioApi(element).attr('href') ?? "";
         if (!url) return;
 
         if (!url.startsWith('http')) {
@@ -36,10 +35,10 @@ export async function crawlPages(targetUrl, emails= []) {
           urlsToVisit.push(url);
         }
     });
-    const mailtoLinks = [];
+    const mailtoLinks: string[] = [];
     cheerioApi('a[href^="mailto:"]').each((_, el) => {
-        const href = cheerioApi(el).attr("href");
-        const email = href.replace("mailto:", "").split("?")[0];
+        const href: string = cheerioApi(el).attr("href") ?? "";
+        const email: string = href.replace("mailto:", "").split("?")[0] ?? "";
         mailtoLinks.push(email);
     });
     const text = cheerioApi("body").text();
@@ -47,7 +46,7 @@ export async function crawlPages(targetUrl, emails= []) {
     const textEmails = text.match(emailRegex) || [];
     
     result = [...new Set([...mailtoLinks, ...textEmails, ...result])];
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error fetching ${currentUrl}: ${error.message}`);
     }
   }

@@ -5,6 +5,17 @@ import cors from "cors";
 import { crawlPages} from "./crawler.js";
 
 
+interface GoogleSearchItem {
+    title: string;
+    link: string;
+    snippet: string;
+}
+
+interface GoogleSearchResponse {
+    items?: GoogleSearchItem[];
+}
+
+
 dotenv.config();
 
 const app = express();
@@ -28,20 +39,20 @@ app.get("/search", async (req, res) => {
 
   try {
     const response = await fetch(url);
-    const data = await response.json();
+    const data: GoogleSearchResponse = await response.json() as GoogleSearchResponse;;
 
     if (!data.items || data.items.length === 0) {
       return res.json({ message: "No results found" });
     }
 
-    const websites = data.items.map((item) => ({
+    const websites = data.items.map((item: any) => ({
       title: item.title,
       link: item.link,
       snippet: item.snippet
     }));
 
     const emailArrays = await Promise.all(
-      websites.map(async (e) => await crawlPages(e.link, []))
+      websites.map(async (e: any) => await crawlPages(e.link, []))
     );
 
     const allEmails = emailArrays.flat(Infinity);
