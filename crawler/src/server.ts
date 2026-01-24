@@ -1,19 +1,10 @@
-import express from "express";
+import express, { type Request, type Response } from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 import cors from "cors"; 
 import { crawlPages} from "./crawler.js";
+import logger from "./logger.js";
 
-
-interface GoogleSearchItem {
-    title: string;
-    link: string;
-    snippet: string;
-}
-
-interface GoogleSearchResponse {
-    items?: GoogleSearchItem[];
-}
 
 
 dotenv.config();
@@ -25,12 +16,17 @@ const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.GOOGLE_API_KEY;
 const CSE_ID = process.env.GOOGLE_CSE_ID;
 
-app.get("/healz", (req,res)=> {res.json({status: 200})});
+app.get("/healz", (_, res: Response)=> {
+  logger.info("Healz completed successfully")
+  res.json({status: 200})
+});
 
-app.get("/search", async (req, res) => {
+app.get("/search", async (req: Request, res: Response) => {
   const { company, city } = req.query;
+  logger.info("Search request received", { company, city });
 
   if (!company) {
+    logger.warn("Search attempted without company name");
     return res.status(400).json({ error: "Missing company or city parameter" });
   }
 
@@ -39,9 +35,10 @@ app.get("/search", async (req, res) => {
 
   try {
     const response = await fetch(url);
-    const data: GoogleSearchResponse = await response.json() as GoogleSearchResponse;;
+    const data:any = await response.json()
 
     if (!data.items || data.items.length === 0) {
+      logger.info("No Google Search results found", { query });
       return res.json({ message: "No results found" });
     }
 
@@ -59,16 +56,19 @@ app.get("/search", async (req, res) => {
 
     const uniqueEmails = [...new Set(allEmails)];
 
-    res.json({ 
-      websites, 
-      "emails": uniqueEmails });
-  } catch (err) {
-    console.error(err);
+    logger.info("Crawl completed successfully", {
+      emailCount: uniqueEmails.length,
+      company 
+    });
+
+    res.json({ websites, "emails": uniqueEmails });
+
+  } catch (err: any) {
+    logger.error("Search/Crawl failed", { error: err.message, stack: err.stack });
     res.status(500).json({ error: "Failed to fetch search results" });
   }
-  console.log("done!");
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  logger.info(`Server running`, { port: PORT, url: `http://localhost:${PORT}` });
 });
