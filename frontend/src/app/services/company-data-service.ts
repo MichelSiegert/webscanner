@@ -15,9 +15,7 @@ export class CompanyDataService {
       private mapper: CompanyMapperService,
       private companyDbService: CompanyDbService
     ) {
-      this.companyDbService.getCompanies().subscribe((e: Company[])=>{
-        this.refreshCompanies();
-      });
+      this.refreshCompanies();
     }
 
     refreshCompanies() {
@@ -38,7 +36,6 @@ export class CompanyDataService {
                   this.companyDbService.createCompany(c);
                   return c;
                 });
-
             if (newCompanies.length > 0) {
                 this.dataSource.next([...currentCompanies, ...newCompanies]);
             }
