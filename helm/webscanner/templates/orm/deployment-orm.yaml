@@ -7,7 +7,7 @@ metadata:
   name: {{ include "webscanner.ormName" . }}
   namespace: web-scanner-dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: {{ include "webscanner.ormName" . }}

@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Company } from '../types/companies';
 import { OverpassService } from './overpass-service';
 import { CompanyMapperService } from './company-mapper-service';
+import { CompanyDbService } from './company-db-servervice';
 
 @Injectable({ providedIn: 'root' })
 export class CompanyDataService {
@@ -12,7 +13,19 @@ export class CompanyDataService {
     constructor(
       private overpassService: OverpassService,
       private mapper: CompanyMapperService,
-    ) {}
+      private companyDbService: CompanyDbService
+    ) {
+      this.companyDbService.getCompanies().subscribe((e: Company[])=>{
+        this.refreshCompanies();
+      });
+    }
+
+    refreshCompanies() {
+      this.companyDbService.getCompanies().subscribe({
+        next: (companies) => this.dataSource.next(companies),
+        error: (err) => console.error('Error loading companies', err)
+      });
+    }
 
     public fetchCompanies(lat: number, lng: number): void {
         this.overpassService.getNearbyCompanies(lat, lng).subscribe((places: any) => {
@@ -20,7 +33,11 @@ export class CompanyDataService {
 
             const newCompanies = places.elements
                 .filter((p: any) => p.lat && p.lon && !this.exists(p?.tags?.name ?? "", currentCompanies))
-                .map((p: any) => this.mapper.parseCompanyFromJSON(p));
+                .map((p: any) => {
+                  const c: Company = this.mapper.parseCompanyFromJSON(p);
+                  this.companyDbService.createCompany(c);
+                  return c;
+                });
 
             if (newCompanies.length > 0) {
                 this.dataSource.next([...currentCompanies, ...newCompanies]);

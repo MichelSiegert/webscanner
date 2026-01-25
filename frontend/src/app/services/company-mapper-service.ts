@@ -9,7 +9,7 @@ import { LatLng } from 'leaflet';
 })
 export class CompanyMapperService {
 
-    parseCompanyFromJSON(place: any) : Company{
+    parseCompanyFromJSON(place: any) : Company{1
     const location = new LatLng(place.lat, place.lon)
     const companyParams : CompanyParams = {
       location: location,
@@ -20,8 +20,7 @@ export class CompanyMapperService {
       website: place.tags.website? [place.tags.website] : []
     }
     const company = new Company(companyParams);
+
     return company;
   }
 }
-
-
