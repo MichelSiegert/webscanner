@@ -72,6 +72,7 @@ triggerAction(company: Company) {
   .subscribe((result:any)=>{
     company.crawlerState = CrawlerState.SUCCESS;
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
+
     company.companyParams.website = links ?? [];
     if(company.companyParams.website!.length)company.selectedWebsite = company.companyParams.website![0];
     company.companyParams.emails = result?.emails || [];
@@ -101,7 +102,6 @@ sendMail(company: Company) {
         this.selectedCrafts.has(entry.companyParams.craft?.trim() ?? "")
       );
     }
-    this.currentPageIndex = 0;
     this.updatePagination();
   }
 }
