@@ -14,7 +14,9 @@ This Project uses following services(names are subject to change):
 - Frontend: an Angular application deployed with nginx.
 - Email: A FastAPI endpoint to sent mails to pot. customers
 - Crawler: a tool to crawl websites of customers.
-- Keycloak: for Auth
+- ORM: object relational mapper, implemented in Python using sqlAlchemy
+- Postgres: as a db
+- Keycloak: for Auth (or rather in progress)
 
 For deployments I use a combination of Helm and skaffold to make deploying and testing easier.
 
