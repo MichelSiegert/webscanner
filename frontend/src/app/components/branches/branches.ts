@@ -22,19 +22,12 @@ export class Branches implements OnInit {
   ngOnInit(): void {
     this.companyDataService.companies$.subscribe((data: Company[])=>{
       this.app = data;
-      this.uniqueCrafts = this.getUniqueCrafts(data);
-    })
+      this.uniqueCrafts = this.craftFilterService.getUniqueCrafts(data);
+    });
   }
 
   toggleCraft(craft: string, checked: boolean) {
-    checked
-      ? this.selectedCrafts.add(craft)
-      : this.selectedCrafts.delete(craft);
-    this.craftFilterService.craftSource.next(this.selectedCrafts);
+    this.craftFilterService.toggleCraft(craft, checked);
   }
 
-  getUniqueCrafts(data: Company[]): string[]{
-    const crafts = new Set<string>( data.map((e: Company) => e.companyParams.craft ?? ""));
-    return Array.from(crafts);
-  }
 }

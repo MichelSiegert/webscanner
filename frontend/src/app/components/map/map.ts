@@ -30,6 +30,7 @@ export class MapComponent implements AfterViewInit {
   private map: L.Map | undefined;
   private markerLayer = L.layerGroup();
   private allMarkers: { marker: L.Marker, craft: string }[] = [];
+  private crafts: Set<string> = new Set();
 
   constructor(
     private craftFilterService: CraftFilterService,
@@ -63,15 +64,16 @@ ngAfterViewInit(): void {
         this.updateMarkers(companies);
     });
 
-    this.craftFilterService.craftSource.subscribe(filter => {
-        this.applyFilter(filter);
+    this.craftFilterService.crafts$.subscribe(filter => {
+        this.crafts = filter;
+        this.applyFilter();
     });
 }
 
-  applyFilter(selectedCrafts: Set<string>) {
+  applyFilter() {
     this.markerLayer.clearLayers();
     this.allMarkers.forEach(item => {
-      if (selectedCrafts.size === 0 || selectedCrafts.has(item.craft)) {
+      if (this.crafts.size === 0 || this.crafts.has(item.craft)) {
         item.marker.addTo(this.markerLayer);
       }
     });
@@ -93,7 +95,7 @@ ngAfterViewInit(): void {
       if (!this.isMarkerAt(company.companyParams.location)) {
           const marker = L.marker([company.companyParams.location.lat, company.companyParams.location.lng]);
           this.allMarkers.push({ marker, craft: company.companyParams.craft ?? "" });
-          this.applyFilter(this.craftFilterService.craftSource.value);
+          this.applyFilter();
       }
     });
   }

@@ -1,6 +1,5 @@
 import { Component, signal } from '@angular/core';
 import { MapComponent } from './components/map/map';
-import { MarkerService } from './services/marker';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -21,7 +20,7 @@ import { Branches } from "./components/branches/branches";
     Branches],
   templateUrl: './app.html',
   styleUrl: './app.css',
-  providers:[MarkerService ]
+  providers:[]
 })
 export class App {
   protected readonly title = signal('web-scan-frontend');

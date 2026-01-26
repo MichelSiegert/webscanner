@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Company } from '../types/companies';
 import { OverpassService } from './overpass-service';
 import { CompanyMapperService } from './company-mapper-service';
-import { CompanyDbService } from './company-db-servervice';
+import { CompanyDbService } from './company-db-service';
 
 @Injectable({ providedIn: 'root' })
 export class CompanyDataService {
@@ -50,9 +50,7 @@ export class CompanyDataService {
     company[property] = value;
 
     const currentCompanies = this.dataSource.value;
-    const updatedList = currentCompanies.map(c =>
-      c === company ? company : c
-    );
+    const updatedList = currentCompanies.map(c => c.id === company.id ? company : c);
     this.dataSource.next(updatedList);
 }
 

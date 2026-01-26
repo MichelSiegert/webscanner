@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { MatInputModule } from "@angular/material/input";
-import { CompanyMapperService } from '../../services/company-mapper-service';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { CraftFilterService } from '../../services/craft-filter-service';
@@ -46,7 +45,7 @@ export class Table implements OnInit{
       this.applyFilter();
     });
 
-    this.craftFilterService.craftSource.subscribe((crafts) => {
+    this.craftFilterService.crafts$.subscribe((crafts) => {
       this.currentPageIndex= 0;
       this.selectedCrafts = crafts;
       this.applyFilter();

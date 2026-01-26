@@ -1,14 +1,30 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { CompanyDataService } from './company-data-service';
+import { Company } from '../types/companies';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CraftFilterService {
-    public craftSource = new BehaviorSubject<Set<string>>(new Set());
+
+    private crafts : BehaviorSubject<Set<string>> = new BehaviorSubject<Set<string>>(new Set());
+    public crafts$ = this.crafts.asObservable();
 
   changeToggles(selectedBranches: Set<string>){
-    this.craftSource.next(selectedBranches);
+    this.crafts.next(selectedBranches);
   }
 
+  public toggleCraft(craft: string, checked: boolean) {
+      const selectedCrafts = this.crafts.value;
+    checked
+      ? selectedCrafts.add(craft)
+      : selectedCrafts.delete(craft);
+    this.crafts.next(selectedCrafts);
+  }
+
+  getUniqueCrafts(companies: Company[]): string[] {
+    const crafts = new Set<string>( companies.map((company: Company) => company.companyParams.craft ?? ""));
+    return Array.from(crafts);
+  }
 }

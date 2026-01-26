@@ -24,7 +24,6 @@ export class CompanyDbService {
       "crawler_state": company.crawlerState.toString(),
       "email_state": company.emailState.toString()
     }).subscribe((e)=>{
-      console.log(e);
     });
   }
 
