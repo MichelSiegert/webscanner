@@ -46,7 +46,7 @@ app.get("/search", async (req: Request, res: Response) => {
       title: item.title,
       link: item.link,
       snippet: item.snippet
-    }));
+    })).slice(0, 2);
 
     const emailArrays = await Promise.all(
       websites.map(async (e: any) => await crawlPages(e.link, []))

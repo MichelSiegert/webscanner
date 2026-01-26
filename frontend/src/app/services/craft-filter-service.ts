@@ -24,7 +24,7 @@ export class CraftFilterService {
   }
 
   getUniqueCrafts(companies: Company[]): string[] {
-    const crafts = new Set<string>( companies.map((company: Company) => company.companyParams.craft ?? ""));
-    return Array.from(crafts);
+    const crafts = new Set<string>( companies.map((company: Company) => company.companyParams.craft?.trim().toLocaleLowerCase() ?? ""));
+    return Array.from(crafts).sort();
   }
 }
