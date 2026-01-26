@@ -1,8 +1,9 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, ViewEncapsulation } from '@angular/core';
 import * as L from 'leaflet';
 import { CraftFilterService } from '../../services/craft-filter-service';
 import { CompanyDataService } from '../../services/company-data-service';
 import { Company } from '../../types/companies';
+import 'leaflet.markercluster';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -22,7 +23,8 @@ L.Marker.prototype.options.icon = iconDefault;
 @Component({
   selector: 'app-map',
   templateUrl: './map.html',
-  styleUrls: ['./map.css']
+  styleUrls: ['./map.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class MapComponent implements AfterViewInit {
   currrentbranch: string = "";
@@ -31,6 +33,7 @@ export class MapComponent implements AfterViewInit {
   private markerLayer = L.layerGroup();
   private allMarkers: { marker: L.Marker, craft: string }[] = [];
   private crafts: Set<string> = new Set();
+  private markerClusterGroup = L.markerClusterGroup();
 
   constructor(
     private craftFilterService: CraftFilterService,
@@ -41,6 +44,25 @@ export class MapComponent implements AfterViewInit {
     this.map = L.map('map', {
       center: [54.3233, 10.1228],
       zoom: 8
+    });
+
+    this.markerClusterGroup = L.markerClusterGroup({
+    iconCreateFunction: (cluster) => {
+    const count = cluster.getChildCount();
+    let sizeClass = 'small';
+
+    if (count > 50) {
+      sizeClass = 'large';
+    } else if (count > 20) {
+      sizeClass = 'medium';
+    }
+
+    return L.divIcon({
+      html: `<div><span>${count}</span></div>`,
+      className: `custom-cluster cluster-${sizeClass}`,
+      iconSize: L.point(40, 40)
+        });
+      }
     });
 
     const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -56,9 +78,9 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
-ngAfterViewInit(): void {
+  ngAfterViewInit(): void {
     this.initMap();
-    this.markerLayer.addTo(this.map!);
+    this.map!.addLayer(this.markerClusterGroup);
 
     this.companyDataService.companies$.subscribe(companies => {
         this.updateMarkers(companies);
@@ -68,15 +90,16 @@ ngAfterViewInit(): void {
         this.crafts = filter;
         this.applyFilter();
     });
-}
+  }
 
   applyFilter() {
-    this.markerLayer.clearLayers();
-    this.allMarkers.forEach(item => {
-      if (this.crafts.size === 0 || this.crafts.has(item.craft)) {
-        item.marker.addTo(this.markerLayer);
-      }
-    });
+      this.markerClusterGroup.clearLayers();
+
+      const filteredMarkers = this.allMarkers
+        .filter(item => this.crafts.size === 0 || this.crafts.has(item.craft))
+        .map(item => item.marker);
+
+      this.markerClusterGroup.addLayers(filteredMarkers);
   }
 
   isMarkerAt(location: L.LatLng) {
@@ -91,12 +114,16 @@ ngAfterViewInit(): void {
   }
 
   private updateMarkers(companies: Company[]) {
-    companies.forEach((company: Company) => {
-      if (!this.isMarkerAt(company.companyParams.location)) {
-          const marker = L.marker([company.companyParams.location.lat, company.companyParams.location.lng]);
-          this.allMarkers.push({ marker, craft: company.companyParams.craft ?? "" });
-          this.applyFilter();
-      }
-    });
-  }
+      companies.forEach((company: Company) => {
+          const alreadyExists = this.allMarkers.some(m =>
+              m.marker.getLatLng().equals(company.companyParams.location, 0.0001)
+          );
+
+          if (!alreadyExists) {
+              const marker = L.marker([company.companyParams.location.lat, company.companyParams.location.lng]);
+              this.allMarkers.push({ marker, craft: company.companyParams.craft ?? "" });
+          }
+      });
+      this.applyFilter();
+    }
 }
