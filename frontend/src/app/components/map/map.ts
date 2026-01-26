@@ -51,9 +51,9 @@ export class MapComponent implements AfterViewInit {
     const count = cluster.getChildCount();
     let sizeClass = 'small';
 
-    if (count > 50) {
+    if (count > 200) {
       sizeClass = 'large';
-    } else if (count > 20) {
+    } else if (count > 100) {
       sizeClass = 'medium';
     }
 
@@ -121,7 +121,21 @@ export class MapComponent implements AfterViewInit {
 
           if (!alreadyExists) {
               const marker = L.marker([company.companyParams.location.lat, company.companyParams.location.lng]);
-              this.allMarkers.push({ marker, craft: company.companyParams.craft ?? "" });
+
+              const popupContent = `
+        <div class="map-popup">
+          <h3>${company.companyParams.name}</h3>
+          <p><strong>Craft:</strong> ${company.companyParams.craft || 'N/A'}</p>
+          <hr />
+          ${company.selectedWebsite ?
+            `<p>website: <a href="${company.selectedWebsite}" target="_blank">Visit</a></p>` : ''}
+          ${company.selectedEmail ?
+            `<p>email: <a href="mailto:${company.selectedEmail}">${company.selectedEmail}</a></p>` : ''}
+        </div>
+      `;
+
+      marker.bindPopup(popupContent);
+              this.allMarkers.push({ marker, craft: company.companyParams.craft ?? ""  });
           }
       });
       this.applyFilter();
