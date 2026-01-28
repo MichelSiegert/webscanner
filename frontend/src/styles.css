@@ -1,3 +1,39 @@
 @import "tailwindcss";
 
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+.green-success-snackbar.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #2bbe68 !important;
+}
+.green-success-snackbar .mdc-snackbar__label,
+.green-success-snackbar .mat-mdc-snack-bar-action {
+  color: #ffffff !important;
+}
+
+.red-error-snackbar.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #ff3737 !important;
+}
+.red-error-snackbar .mdc-snackbar__label,
+.red-error-snackbar .mat-mdc-snack-bar-action {
+  color: #ffffff !important;
+}
+
+.orange-warning-snackbar.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #ff6f00 !important;
+}
+.orange-warning-snackbar .mdc-snackbar__label,
+.orange-warning-snackbar .mat-mdc-snack-bar-action {
+  color: #ffffff !important;
+}
+
+.default-snackbar.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #323232 !important;
+}
+.default-snackbar .mdc-snackbar__label,
+.default-snackbar .mat-mdc-snack-bar-action {
+  color: #ffffff !important;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+  font-weight: 500 !important;
+}

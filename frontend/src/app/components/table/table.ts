@@ -11,6 +11,7 @@ import { Company } from '../../types/companies';
 import CrawlerState from  '../../types/crawlstate';
 import EmailState from '../../types/emailstate';
 import { CompanyDataService } from '../../services/company-data-service';
+import { SnackbarService } from '../../services/snackbar-service';
 
 @Component({
   selector: 'app-table',
@@ -36,9 +37,16 @@ export class Table implements OnInit{
   public CrawlerState = CrawlerState;
   public EmailState = EmailState;
 
+
   private selectedCrafts: Set<string> = new Set();
 
-  constructor(protected companyDataService: CompanyDataService, private http: HttpClient, private craftFilterService: CraftFilterService) {}
+  constructor(
+    protected companyDataService: CompanyDataService,
+    private http: HttpClient,
+    private craftFilterService: CraftFilterService,
+    private snackbarService: SnackbarService
+  ) { }
+
   ngOnInit(): void {
     this.companyDataService.companies$.subscribe((e: Company[])=>{
       this.entries = e
@@ -66,9 +74,17 @@ export class Table implements OnInit{
 
 triggerAction(company: Company) {
   if ([CrawlerState.PENDING, CrawlerState.SUCCESS].includes(company.crawlerState)) return;
+
   company.crawlerState = CrawlerState.PENDING;
-  this.http.get(`/api/search?company=${company.companyParams.name}&city=${company.companyParams.city}`)
-  .subscribe((result:any)=>{
+  this.http.get(`/api/search`,
+    {
+      params:{
+        city: company.companyParams.city ?? "",
+        company: company.companyParams.name
+      }
+  })
+  .subscribe({
+    next: (result: any) => {
     company.crawlerState = CrawlerState.SUCCESS;
     const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
 
@@ -78,19 +94,42 @@ triggerAction(company: Company) {
     if(company.companyParams.emails!.length)company.selectedEmail= company.companyParams.emails![0]
 
     this.companyDataService.updateEntry(company);
+    },
+    error: (e: any) => {
+      company.crawlerState = CrawlerState.FAILED;
+      this.snackbarService.showErrorMessage(`error sending email: ${e.message}`);
+      company.crawlerState = CrawlerState.NOT_STARTED;
+      this.companyDataService.updateEntry(company);
+    }
   });
 }
 
 sendMail(company: Company) {
   if([EmailState.PENDING, EmailState.SUCCESS].includes(company.emailState)) return;
 
-  this.http.get(`/email?website=${company.selectedWebsite}&email=${company.selectedEmail}`)
-  .subscribe((result: any)=>{
+  company.emailState = EmailState.PENDING;
+
+  this.http.get("/email", {
+    params:
+    {
+      website: company.selectedWebsite,
+      email: company.selectedEmail
+    }
+  })
+  .subscribe({
+    next:(result: any)=>{
     if(result.status == 200) {
       company.emailState = EmailState.SUCCESS;
       this.companyDataService.updateEntry(company);
     }
-  });
+  },
+  error: (e: any) => {
+    company.emailState = EmailState.FAILED;
+    this.snackbarService.showErrorMessage(`error sending email: ${e.message}`);
+    company.emailState= EmailState.NOT_STARTED;
+    this.companyDataService.updateEntry(company);
+  }
+});
 }
 
   private applyFilter() {
