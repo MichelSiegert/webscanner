@@ -4,10 +4,10 @@
   background-color: #ffffff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   overflow-y: auto;
-  max-height: 80vh;
   padding: 1rem;
+  max-height: 600px;
 }
 
 .innerPannelRight{
-  max-height: 60vh;
+  max-height: 520px;
 }
