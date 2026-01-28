@@ -32,10 +32,11 @@ export class CompanyDataService {
             const newCompanies = places.elements
                 .filter((p: any) => p.lat && p.lon && !this.exists(p?.tags?.name ?? "", currentCompanies))
                 .map((p: any) => {
-                  const c: Company = this.mapper.parseCompanyFromJSON(p);
-                  this.companyDbService.createCompany(c);
+                  const c: Company = this.mapper.parseCompanyFromJSON(p)
                   return c;
                 });
+            this.companyDbService.bulkCreateCompanies(newCompanies).subscribe((e: any)=>{console.log(e);});
+
             if (newCompanies.length > 0) {
                 this.dataSource.next([...currentCompanies, ...newCompanies]);
             }
@@ -51,6 +52,7 @@ export class CompanyDataService {
 
     const currentCompanies = this.dataSource.value;
     const updatedList = currentCompanies.map(c => c.id === company.id ? company : c);
+    this.companyDbService.updateCompany(company).subscribe((e)=>{console.log(e)});
     this.dataSource.next(updatedList);
 }
 
@@ -60,6 +62,7 @@ export class CompanyDataService {
         const isMatch = c.companyParams.name === updatedCompany.companyParams.name;
         return isMatch ? updatedCompany : c;}
     );
+    this.companyDbService.updateCompany(updatedCompany).subscribe((e)=>{console.log(e)});
     this.dataSource.next(updatedList)
   }
 }

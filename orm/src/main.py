@@ -28,6 +28,12 @@ def create_company(data: dict, db: Session = Depends(get_db)):
     db.refresh(new_company)
     return new_company
 
+@app.post("/companies/bulk")
+def bulk_create_companies(data: list[dict], db: Session = Depends(get_db)):
+    db.bulk_insert_mappings(Company, data)
+    db.commit()
+    return {"message": f"Created {len(data)} companies"}
+
 @app.get("/companies")
 def get_companies(db: Session = Depends(get_db)):
     return db.query(Company).all()

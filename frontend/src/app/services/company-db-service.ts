@@ -11,8 +11,8 @@ import { LatLng } from 'leaflet';
 export class CompanyDbService {
   constructor(private http: HttpClient){}
 
-  createCompany(company: Company) {
-    this.http.post("/customerdb/companies", {
+  bulkCreateCompanies(companies: Company[]): Observable<any> {
+  const payloads = companies.map((company: Company) => ({
       "id": company.id,
       "name": company.companyParams.name ?? "",
       "craft": company.companyParams.craft ?? "",
@@ -23,8 +23,23 @@ export class CompanyDbService {
       "longitude": company.companyParams.location.lng,
       "crawler_state": company.crawlerState.toString(),
       "email_state": company.emailState.toString()
-    }).subscribe((e)=>{
-    });
+  }));
+  return this.http.post("/customerdb/companies/bulk", payloads);
+}
+
+  createCompany(company: Company) {
+    return this.http.post("/customerdb/companies", {
+      "id": company.id,
+      "name": company.companyParams.name ?? "",
+      "craft": company.companyParams.craft ?? "",
+      "city": company.companyParams.city ?? "",
+      "emails": company.companyParams.emails ?? [],
+      "websites": company.companyParams.website ?? [],
+      "latitude": company.companyParams.location.lat,
+      "longitude": company.companyParams.location.lng,
+      "crawler_state": company.crawlerState.toString(),
+      "email_state": company.emailState.toString()
+    })
   }
 
   getCompanies(): Observable<Company[]> {
@@ -41,5 +56,25 @@ export class CompanyDbService {
         return new Company(companyParams, e.id, e.email_state, e.crawler_state);
       }))
     );
+  }
+
+  updateCompany(company: Company): Observable<any> {
+    const payload = {
+      "id": company.id,
+      "name": company.companyParams.name ?? "",
+      "craft": company.companyParams.craft ?? "",
+      "city": company.companyParams.city ?? "",
+      "emails": company.companyParams.emails ?? [],
+      "websites": company.companyParams.website ?? [],
+      "latitude": company.companyParams.location.lat,
+      "longitude": company.companyParams.location.lng,
+      "crawler_state": company.crawlerState.toString(),
+      "email_state": company.emailState.toString()
+    };
+    return this.http.put(`/customerdb/companies/${company.id}`, payload);
+  }
+
+  deleteCompany(id: string): Observable<any> {
+    return this.http.delete(`/customerdb/companies/${id}`);
   }
 }
