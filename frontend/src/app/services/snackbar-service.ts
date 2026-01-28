@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SNACK_BAR_MESSAGE_TYPE } from '../types/snackbarmessagetype';
+import { SnackbarComponent } from '../components/snackbar-component/snackbar-component';
 
-@Injectable({
-  providedIn: 'root'
-})
+
+@Injectable({providedIn: 'root'})
 export class SnackbarService {
   constructor(private snackBar: MatSnackBar) { }
 
   public showSnackBar(context: string, message: string) {
-    console.log(context);
-    this.snackBar.open(message, 'close', {
+    this.snackBar.openFromComponent(SnackbarComponent, {
+      data: { message: message },
       duration: 3000,
       panelClass: [context || SNACK_BAR_MESSAGE_TYPE.default],
       verticalPosition: 'bottom',

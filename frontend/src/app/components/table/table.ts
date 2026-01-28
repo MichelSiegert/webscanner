@@ -28,17 +28,16 @@ import { SnackbarService } from '../../services/snackbar-service';
   styleUrl: './table.css'
 })
 export class Table implements OnInit{
+  private selectedCrafts: Set<string> = new Set();
+  private currentPageSize = 5;
 
   public entries : Company[]= [];
   public filteredEntries: any[] = [];
   public paginatedEntries: any[] = [];
-  private currentPageSize = 5;
   public currentPageIndex = 0;
   public CrawlerState = CrawlerState;
   public EmailState = EmailState;
 
-
-  private selectedCrafts: Set<string> = new Set();
 
   constructor(
     protected companyDataService: CompanyDataService,
@@ -92,6 +91,7 @@ triggerAction(company: Company) {
     if(company.companyParams.website!.length)company.selectedWebsite = company.companyParams.website![0];
     company.companyParams.emails = result?.emails || [];
     if(company.companyParams.emails!.length)company.selectedEmail= company.companyParams.emails![0]
+      this.snackbarService.showSuccessMessage(`The crawler for company ${company.companyParams.name} successfully finished!`);
 
     this.companyDataService.updateEntry(company);
     },
@@ -121,6 +121,7 @@ sendMail(company: Company) {
     if(result.status == 200) {
       company.emailState = EmailState.SUCCESS;
       this.companyDataService.updateEntry(company);
+      this.snackbarService.showSuccessMessage(`The email for company ${company.companyParams.name} has been sent to ${company.selectedEmail}!`);
     }
   },
   error: (e: any) => {
