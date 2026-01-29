@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors"; 
 import { crawlPages} from "./crawler.js";
 import logger from "./logger.js";
+import { error } from "node:console";
 
 
 
@@ -11,18 +12,21 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
+app.use(express.json());
+
 const PORT = process.env.PORT || 3000;
 
 const API_KEY = process.env.GOOGLE_API_KEY;
 const CSE_ID = process.env.GOOGLE_CSE_ID;
+if(!API_KEY || !CSE_ID) throw new Error("API KEY and CSE ID must be defined!");
 
 app.get("/healz", (_, res: Response)=> {
   logger.info("Healz completed successfully")
   res.json({status: 200})
 });
 
-app.get("/search", async (req: Request, res: Response) => {
-  const { company, city } = req.query;
+app.post("/search", async (req: Request, res: Response) => {
+  const { company, city } = req.body;
   logger.info("Search request received", { company, city });
 
   if (!company) {

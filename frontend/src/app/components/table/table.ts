@@ -75,12 +75,10 @@ crawlPage(company: Company) {
   if ([CrawlerState.PENDING, CrawlerState.SUCCESS].includes(company.crawlerState)) return;
 
   company.crawlerState = CrawlerState.PENDING;
-  this.http.get(`/api/search`,
-    {
-      params:{
-        city: company.companyParams.city ?? "",
-        company: company.companyParams.name
-      }
+  this.http.post(`/api/search`,
+   {
+    city: company.companyParams.city ?? "",
+    company: company.companyParams.name
   })
   .subscribe({
     next: (result: any) => {
