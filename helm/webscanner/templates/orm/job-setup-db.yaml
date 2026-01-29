@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  creationTimestamp: null
+  name: setup-db
+  namespace: web-scanner-dev
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+    spec:
+      serviceAccountName: job-watcher
+      initContainers:
+        - name: job-waiter
+          image: bitnami/kubectl:latest
+          command:
+          - /bin/sh
+          - -c
+          - |
+            until [ "$(kubectl get job setup-python-db-job -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')" == "True" ]; do
+              echo "db needs to be setup"
+              sleep 5
+            done
+            echo "Db is now set up!"
+      containers:
+      - image: job-web-scan-setup
+        name: setup-db
+        env:
+        - name: DATABASE_URL
+          value: {{ .Values.orm.dbUrl }}
+        resources: {}
+      restartPolicy: Never

@@ -21,6 +21,10 @@ build:
       context: orm
       docker:
         dockerfile: Dockerfile
+    - image: job-web-scan-setup
+      context: orm-job
+      docker:
+        dockerfile: Dockerfile
 
 deploy:
   helm:
@@ -51,6 +55,10 @@ profiles:
             dockerfile: Dockerfile
         - image: web-scan-email
           context: email
+          docker:
+            dockerfile: Dockerfile
+        - image: job-web-scan-setup
+          context: orm-job
           docker:
             dockerfile: Dockerfile
     deploy:

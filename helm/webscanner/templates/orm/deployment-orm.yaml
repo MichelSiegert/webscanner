@@ -7,7 +7,7 @@ metadata:
   name: {{ include "webscanner.ormName" . }}
   namespace: web-scanner-dev
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: {{ include "webscanner.ormName" . }}
@@ -25,7 +25,7 @@ spec:
           - /bin/sh
           - -c
           - |
-            until [ "$(kubectl get job setup-python-db-job -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')" == "True" ]; do
+            until [ "$(kubectl get job setup-db -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')" == "True" ]; do
               echo "db needs to be setup"
               sleep 5
             done
