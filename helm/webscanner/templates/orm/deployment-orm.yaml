@@ -25,7 +25,7 @@ spec:
           - /bin/sh
           - -c
           - |
-            until [ "$(kubectl get job setup-db -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')" == "True" ]; do
+            until [ "$(kubectl get job {{ .Values.orm.job.name }}  -o jsonpath='{.status.conditions[?(@.type=="Complete")].status}')" == "True" ]; do
               echo "db needs to be setup"
               sleep 5
             done

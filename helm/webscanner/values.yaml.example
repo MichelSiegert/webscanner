@@ -90,6 +90,8 @@ postgres:
     logstatement: all
     port: 5432
     targetPort: 5432
+  job:
+    name: setup-python-db-job
 orm:
   dbUser: ormuser
   dbPassword: 0rmu5RPw4ca28b112cc03fb123fc
@@ -97,4 +99,5 @@ orm:
   dbUrl: postgresql://ormuser:0rmu5RPw4ca28b112cc03fb123fc@postgres:5432/ormdb
   targetPort: 8001
   port: 20001
-  
+  job:
+    name: Setup-orm-tables
