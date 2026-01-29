@@ -39,7 +39,9 @@ app.get("/search", async (req: Request, res: Response) => {
 
     if (!data.items || data.items.length === 0) {
       logger.info("No Google Search results found", { query });
-      return res.json({ message: "No results found" });
+      return res.status(400).json({ 
+        message: "No results found"
+      });
     }
 
     const websites = data.items.map((item: any) => ({
@@ -61,7 +63,10 @@ app.get("/search", async (req: Request, res: Response) => {
       company 
     });
 
-    res.json({ websites, "emails": uniqueEmails });
+    res.status(200).json({ 
+      websites,
+      "emails": uniqueEmails
+    });
 
   } catch (err: any) {
     logger.error("Search/Crawl failed", { error: err.message, stack: err.stack });

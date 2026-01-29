@@ -1,4 +1,6 @@
 import os
+
+from .emailRequest import EmailRequest
 from .crypto import get_current_user
 from .emailtext import createHtml, createText
 from fastapi import FastAPI, Depends
@@ -21,44 +23,34 @@ app = FastAPI(
     root_path="/email"
 )
 
-@app.get("/")
+@app.post("/", status_code=201)
 def send_test_mail(
-    #user: dict = Depends(get_current_user),
-    email: str = "michel@siegert.online",
-    website: str = "https://siegert.online"
+emailRequest: EmailRequest
 ):
-    """Protected endpoint - requires valid JWT"""
     msg = EmailMessage()
     msg["Subject"] = "Professionelle Website für Ihr Unternehmen - Erstberatung"
     msg["From"] = "sender@example.com"
-    msg["To"] = email
+    msg["To"] = emailRequest.companyEmail
 
-    text_content = createText(website)
-    html_content = createHtml(website)
+    text_content = createText(emailRequest.website)
+    html_content = createHtml(emailRequest.website)
 
     msg.set_content(text_content)
-
     msg.add_alternative(html_content, subtype='html')
     
     try:
         with smtplib.SMTP(host, hostPort) as server:
             server.send_message(msg)
-        return {
-            "status": 200,
-            "message": "message sent!",
-            #"sent_by": user.get("preferred_username")
-        }
+        return {"message": "message sent!"}
     except Exception as e:
         return {"status": "error", "details": str(e)}
-
 
 @app.get("/healz")
 def health_check():
     """Unprotected health check endpoint"""
     return {"status": "ok"}
 
-
-@app.get("/me")
+@app.get("/me") 
 def get_user_info(user: dict = Depends(get_current_user)):
     """Return current user's token claims"""
     return {    

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatInputModule } from "@angular/material/input";
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse, HttpStatusCode } from '@angular/common/http';
 import { CraftFilterService } from '../../services/craft-filter-service';
 import {MatSelectModule} from '@angular/material/select';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -32,8 +32,8 @@ export class Table implements OnInit{
   private currentPageSize = 5;
 
   public entries : Company[]= [];
-  public filteredEntries: any[] = [];
-  public paginatedEntries: any[] = [];
+  public filteredCompanies: Company[] = [];
+  public paginatedCompanies: Company[] = [];
   public currentPageIndex = 0;
   public CrawlerState = CrawlerState;
   public EmailState = EmailState;
@@ -62,7 +62,7 @@ export class Table implements OnInit{
   updatePagination() {
     const startIndex = this.currentPageIndex * this.currentPageSize;
     const endIndex = startIndex + this.currentPageSize;
-    this.paginatedEntries = this.filteredEntries.slice(startIndex, endIndex);
+    this.paginatedCompanies = this.filteredCompanies.slice(startIndex, endIndex);
   }
 
   onPageChange(event: PageEvent) {
@@ -71,7 +71,7 @@ export class Table implements OnInit{
     this.updatePagination();
   }
 
-triggerAction(company: Company) {
+crawlPage(company: Company) {
   if ([CrawlerState.PENDING, CrawlerState.SUCCESS].includes(company.crawlerState)) return;
 
   company.crawlerState = CrawlerState.PENDING;
@@ -84,16 +84,17 @@ triggerAction(company: Company) {
   })
   .subscribe({
     next: (result: any) => {
-    company.crawlerState = CrawlerState.SUCCESS;
-    const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
+      company.crawlerState = CrawlerState.SUCCESS;
+      const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
 
-    company.companyParams.website = links ?? [];
-    if(company.companyParams.website!.length)company.selectedWebsite = company.companyParams.website![0];
-    company.companyParams.emails = result?.emails || [];
-    if(company.companyParams.emails!.length)company.selectedEmail= company.companyParams.emails![0]
+      company.companyParams.website = links ?? [];
+      if(company.companyParams.website!.length)company.selectedWebsite = company.companyParams.website![0];
+      company.companyParams.emails = result?.emails || [];
+
+      if(company.companyParams.emails!.length)company.selectedEmail= company.companyParams.emails![0];
       this.snackbarService.showSuccessMessage(`The crawler for company ${company.companyParams.name} successfully finished!`);
 
-    this.companyDataService.updateEntry(company);
+      this.companyDataService.updateEntry(company);
     },
     error: (e: any) => {
       company.crawlerState = CrawlerState.FAILED;
@@ -109,19 +110,22 @@ sendMail(company: Company) {
 
   company.emailState = EmailState.PENDING;
 
-  this.http.get("/email", {
-    params:
+  this.http.post<HttpResponse<any>>("/email",
     {
       website: company.selectedWebsite,
       email: company.selectedEmail
-    }
+    },
+    {
+    observe: "response"
   })
   .subscribe({
-    next:(result: any)=>{
-    if(result.status == 200) {
+    next:(mailSentResponse: HttpResponse<any>)=>{
+    if(mailSentResponse.status == HttpStatusCode.Created ) {
       company.emailState = EmailState.SUCCESS;
       this.companyDataService.updateEntry(company);
       this.snackbarService.showSuccessMessage(`The email for company ${company.companyParams.name} has been sent to ${company.selectedEmail}!`);
+    } else {
+          this.snackbarService.showErrorMessage(`response returned with status  ${mailSentResponse.status}`);
     }
   },
   error: (e: any) => {
@@ -132,12 +136,11 @@ sendMail(company: Company) {
   }
 });
 }
-
   private applyFilter() {
     if (this.selectedCrafts.size === 0) {
-      this.filteredEntries = [...this.entries];
+      this.filteredCompanies = [...this.entries];
     } else {
-      this.filteredEntries = this.entries.filter(entry =>
+      this.filteredCompanies = this.entries.filter(entry =>
         this.selectedCrafts.has(entry.companyParams.craft?.trim() ?? "")
       );
     }
