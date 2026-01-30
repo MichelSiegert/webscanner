@@ -75,34 +75,43 @@ crawlPage(company: Company) {
   if ([CrawlerState.PENDING, CrawlerState.SUCCESS].includes(company.crawlerState)) return;
 
   company.crawlerState = CrawlerState.PENDING;
-  this.http.post(`/api/search`,
-   {
+
+  this.http.post(`/api/search`, {
     city: company.companyParams.city ?? "",
     company: company.companyParams.name
   })
   .subscribe({
     next: (result: any) => {
+      if (!result?.websites?.length) {
+        this.handleCrawlerFailure(company, "No websites found for this company.");
+        return;
+      }
+
       company.crawlerState = CrawlerState.SUCCESS;
-      const links = (result?.websites || []).map((r: any) => r.link).filter((link: any) => !!link);
+      const links = result.websites.map((r: any) => r.link).filter((link: any) => !!link);
 
-      company.companyParams.website = links ?? [];
-      if(company.companyParams.website!.length)company.selectedWebsite = company.companyParams.website![0];
-      company.companyParams.emails = result?.emails || [];
+      company.companyParams.website = links;
+      if(links.length) company.selectedWebsite = links[0];
 
-      if(company.companyParams.emails!.length)company.selectedEmail= company.companyParams.emails![0];
-      this.snackbarService.showSuccessMessage(`The crawler for company ${company.companyParams.name} successfully finished!`);
+      company.companyParams.emails = result.emails || [];
+      if(company.companyParams.emails?.length) company.selectedEmail = company.companyParams.emails[0];
 
+      this.snackbarService.showSuccessMessage(`Crawler finished for ${company.companyParams.name}`);
       this.companyDataService.updateEntry(company);
     },
-    error: (e: any) => {
-      company.crawlerState = CrawlerState.FAILED;
-      this.snackbarService.showErrorMessage(`error sending email: ${e.message}`);
-      company.crawlerState = CrawlerState.NOT_STARTED;
-      this.companyDataService.updateEntry(company);
+    error: (err: any) => {
+      const errorMessage = err.error?.message || err.error?.error || "An unknown error occurred";
+      this.handleCrawlerFailure(company, errorMessage);
     }
   });
 }
 
+private handleCrawlerFailure(company: Company, message: string) {
+  company.crawlerState = CrawlerState.FAILED;
+  this.snackbarService.showErrorMessage(message);
+  company.crawlerState = CrawlerState.NOT_STARTED;
+  this.companyDataService.updateEntry(company);
+}
 sendMail(company: Company) {
   if([EmailState.PENDING, EmailState.SUCCESS].includes(company.emailState)) return;
 
