@@ -112,6 +112,7 @@ private handleCrawlerFailure(company: Company, message: string) {
   company.crawlerState = CrawlerState.NOT_STARTED;
   this.companyDataService.updateEntry(company);
 }
+
 sendMail(company: Company) {
   if([EmailState.PENDING, EmailState.SUCCESS].includes(company.emailState)) return;
 
@@ -132,17 +133,22 @@ sendMail(company: Company) {
       this.companyDataService.updateEntry(company);
       this.snackbarService.showSuccessMessage(`The email for company ${company.companyParams.name} has been sent to ${company.selectedEmail}!`);
     } else {
-          this.snackbarService.showErrorMessage(`response returned with status  ${mailSentResponse.status}`);
+      this.handleMailFailure(company, `Unexpected status: ${mailSentResponse.status}`);      }
+    },
+    error: (err) => {
+    const errorDetail = err.error?.detail || err.message || "Server error";
+      this.handleMailFailure(company, `Error: ${errorDetail}`);
+      this.companyDataService.updateEntry(company);
     }
-  },
-  error: (e: any) => {
-    company.emailState = EmailState.FAILED;
-    this.snackbarService.showErrorMessage(`error sending email: ${e.message}`);
-    company.emailState= EmailState.NOT_STARTED;
-    this.companyDataService.updateEntry(company);
-  }
 });
 }
+
+private handleMailFailure(company: Company, message: string) {
+  this.snackbarService.showErrorMessage(message);
+  company.emailState = EmailState.FAILED;
+  company.emailState = EmailState.NOT_STARTED;
+}
+
   private applyFilter() {
     if (this.selectedCrafts.size === 0) {
       this.filteredCompanies = [...this.entries];

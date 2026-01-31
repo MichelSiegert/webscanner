@@ -1,3 +1,4 @@
+from http.client import HTTPException
 import os
 
 from .emailRequest import EmailRequest
@@ -43,7 +44,7 @@ emailRequest: EmailRequest
             server.send_message(msg)
         return {"message": "message sent!"}
     except Exception as e:
-        return {"status": "error", "details": str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/healz")
 def health_check():
