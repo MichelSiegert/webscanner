@@ -76,7 +76,7 @@ crawlPage(company: Company) {
 
   company.crawlerState = CrawlerState.PENDING;
 
-  this.http.post(`/api/search`, {
+  this.http.post(`/crawler/search`, {
     city: company.companyParams.city ?? "",
     company: company.companyParams.name
   })
