@@ -18,4 +18,8 @@ webscanner
 {{ include "webscanner.name" . }}-orm
 {{- end -}}
 
+{{- define "webscanner.analyzerName" -}}
+{{ include "webscanner.name" . }}-analyzer
+{{- end -}}
+
 

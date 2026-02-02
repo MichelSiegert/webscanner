@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ include "webscanner.analyzerName" . }}
+  name: {{ include "webscanner.analyzerName" . }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.analyzer.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "webscanner.analyzerName" . }}
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: {{ include "webscanner.analyzerName" . }}
+    spec:
+      containers:
+      - image: web-scan-analyzer
+        name: {{ include "webscanner.analyzerName" . }}
+        resources: {}
+        env:
+        - name: PORT
+          value: {{ .Values.analyzer.targetPort | quote }}
+        livenessProbe:
+          httpGet:
+            path: /healz
+            port: {{ .Values.analyzer.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 10
+status: {}
