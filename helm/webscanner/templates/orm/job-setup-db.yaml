@@ -3,7 +3,7 @@ kind: Job
 metadata:
   creationTimestamp: null
   name: {{ .Values.orm.job.name }}
-  namespace: web-scanner-dev
+  namespace: {{ .Values.namespace }}
 spec:
   template:
     metadata:

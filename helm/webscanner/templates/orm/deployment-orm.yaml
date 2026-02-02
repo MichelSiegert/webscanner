@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ include "webscanner.ormName" . }}
   name: {{ include "webscanner.ormName" . }}
-  namespace: web-scanner-dev
+  namespace: {{ .Values.namespace }}
 spec:
   replicas: 2
   selector:
