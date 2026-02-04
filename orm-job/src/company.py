@@ -1,14 +1,10 @@
 from sqlalchemy import Column, String, Float, JSON, Enum
+from sqlalchemy.orm import relationship
+from benchmark import Benchmark
 from database import Base
 import enum
 
-class CrawlerState(enum.Enum):
-    NOT_STARTED = "NOT_STARTED"
-    PENDING = "PENDING"
-    SUCCESS = "SUCCESS"
-    FAILED = "FAILED"
-
-class EmailState(enum.Enum):
+class RequestState(enum.Enum):
     NOT_STARTED = "NOT_STARTED"
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
@@ -16,7 +12,6 @@ class EmailState(enum.Enum):
 
 class Company(Base):
     __tablename__ = "companies"
-
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     craft = Column(String)
@@ -30,5 +25,8 @@ class Company(Base):
     selected_email = Column(String)
     selected_website = Column(String)
     
-    crawler_state = Column(Enum(CrawlerState), default=CrawlerState.NOT_STARTED)
-    email_state = Column(Enum(EmailState), default=EmailState.NOT_STARTED)
+    crawler_state = Column(Enum(RequestState), default=RequestState.NOT_STARTED)
+    email_state = Column(Enum(RequestState), default=RequestState.NOT_STARTED)
+    analyze_state = Column(Enum(RequestState), default=RequestState.NOT_STARTED)
+    benchmarks = relationship("Benchmark", back_populates="company", cascade="all, delete-orphan")
+    

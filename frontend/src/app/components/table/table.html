@@ -92,12 +92,21 @@
         <td class="px-6 py-4 whitespace-nowrap text-center flex">
         <button
           (click)="crawlPage(company)"
-          [disabled]="[CrawlerState.SUCCESS || CrawlerState.PENDING ].includes(company.crawlerState)"
-          class="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300
-                text-white font-semibold py-1 px-3 rounded mr-5
-                flex items-center justify-center min-w-[120px]"
+          [disabled]="[RequestState.SUCCESS || RequestState.PENDING ].includes(company.crawlerState)"
+          class="bg-blue-500
+          hover:bg-blue-600
+          disabled:bg-blue-300
+          text-white
+            font-semibold
+            py-1 px-3
+            rounded
+            mr-5
+            flex
+            items-center
+            justify-center
+            min-w-[120px]"
         >
-          @if (company.crawlerState === CrawlerState.PENDING) {
+          @if (company.crawlerState === RequestState.PENDING) {
             <mat-progress-spinner
               diameter="20"
               mode="indeterminate"
@@ -108,12 +117,33 @@
           }
         </button>
         <button
-          (click)="sendMail(company)"
-          [disabled]="[EmailState.PENDING, EmailState.SUCCESS].includes(company.emailState) || !company.selectedWebsite || !company.selectedEmail"
+          (click)="analyzePage(company)"
+          [disabled]="[RequestState.PENDING, RequestState.SUCCESS].includes(company.analyzeState) || !company.selectedWebsite"
           class="bg-white
                 text-blue-600
                 border border-blue-600
                 font-semibold
+                py-1
+                px-3
+                mr-5
+                rounded
+                transition-colors
+                duration-200
+                hover:bg-blue-50
+                disabled:bg-gray-100
+                disabled:text-gray-400
+                disabled:border-gray-300
+                disabled:cursor-not-allowed"
+        >
+          Analyze Website
+        </button>
+        <button
+          (click)="sendMail(company)"
+          [disabled]="[RequestState.PENDING, RequestState.SUCCESS].includes(company.emailState) || !company.selectedWebsite || !company.selectedEmail"
+          class="bg-white
+                border border-blue-600
+                font-semibold
+              text-blue-600
                 py-1
                 px-3
                 rounded

@@ -1,5 +1,5 @@
 import os
-from database import engine, Base, get_db
+from database import get_db
 from sqlalchemy.orm import Session
 from company import Company 
 from fastapi import FastAPI, Depends, HTTPException
@@ -23,7 +23,14 @@ def create_company(data: dict, db: Session = Depends(get_db)):
 
 @app.post("/companies/bulk")
 def bulk_create_companies(data: list[dict], db: Session = Depends(get_db)):
-    db.bulk_insert_mappings(Company, data)
+    company_objects = []
+    for entry in data:
+        benchmarks_data = entry.pop('benchmarks', [])
+        company = Company(**entry)
+        company.benchmarks = [Benchmark(**b) for b in benchmarks_data]
+        company_objects.append(company)
+    
+    db.add_all(company_objects)
     db.commit()
     return {"message": f"Created {len(data)} companies"}
 

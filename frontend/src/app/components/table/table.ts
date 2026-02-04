@@ -8,10 +8,9 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { Company } from '../../types/companies';
-import CrawlerState from  '../../types/crawlstate';
-import EmailState from '../../types/emailstate';
 import { CompanyDataService } from '../../services/company-data-service';
 import { SnackbarService } from '../../services/snackbar-service';
+import RequestState from '../../types/requestState';
 
 @Component({
   selector: 'app-table',
@@ -35,8 +34,7 @@ export class Table implements OnInit{
   public filteredCompanies: Company[] = [];
   public paginatedCompanies: Company[] = [];
   public currentPageIndex = 0;
-  public CrawlerState = CrawlerState;
-  public EmailState = EmailState;
+  public RequestState = RequestState;
 
 
   constructor(
@@ -72,9 +70,9 @@ export class Table implements OnInit{
   }
 
 crawlPage(company: Company) {
-  if ([CrawlerState.PENDING, CrawlerState.SUCCESS].includes(company.crawlerState)) return;
+  if ([RequestState.PENDING, RequestState.SUCCESS].includes(company.crawlerState)) return;
 
-  company.crawlerState = CrawlerState.PENDING;
+  company.crawlerState = RequestState.PENDING;
 
   this.http.post(`/crawler/search`, {
     city: company.companyParams.city ?? "",
@@ -87,7 +85,7 @@ crawlPage(company: Company) {
         return;
       }
 
-      company.crawlerState = CrawlerState.SUCCESS;
+      company.crawlerState = RequestState.SUCCESS;
       const links = result.websites.map((r: any) => r.link).filter((link: any) => !!link);
 
       company.companyParams.website = links;
@@ -107,16 +105,45 @@ crawlPage(company: Company) {
 }
 
 private handleCrawlerFailure(company: Company, message: string) {
-  company.crawlerState = CrawlerState.FAILED;
+  company.crawlerState = RequestState.FAILED;
   this.snackbarService.showErrorMessage(message);
-  company.crawlerState = CrawlerState.NOT_STARTED;
+  company.crawlerState = RequestState.NOT_STARTED;
   this.companyDataService.updateEntry(company);
 }
 
-sendMail(company: Company) {
-  if([EmailState.PENDING, EmailState.SUCCESS].includes(company.emailState)) return;
+analyzePage(company: Company) {
+  if([RequestState.PENDING, RequestState.SUCCESS].includes(company.analyzeState)) return;
 
-  company.emailState = EmailState.PENDING;
+  company.analyzeState = RequestState.PENDING;
+
+  this.http.get<HttpResponse<any>>("/analyzer",
+    {
+      params: {
+        url: company.selectedWebsite,
+      },
+      observe: "response"
+    })
+  .subscribe({
+    next:(mailSentResponse: HttpResponse<any>)=>{
+    if(mailSentResponse.status == HttpStatusCode.Created ) {
+      company.analyzeState = RequestState.SUCCESS;
+      this.companyDataService.updateEntry(company);
+      this.snackbarService.showSuccessMessage(`Successfully analyzed ${company.companyParams.name} website ${company.selectedWebsite}!`);
+    } else {
+      this.handleMailFailure(company, `Unexpected status: ${mailSentResponse.status}`);      }
+    },
+    error: (err) => {
+    const errorDetail = err.error?.detail || err.message || "Server error";
+      this.handleMailFailure(company, `Error: ${errorDetail}`);
+      this.companyDataService.updateEntry(company);
+    }
+});
+}
+
+sendMail(company: Company) {
+  if([RequestState.PENDING, RequestState.SUCCESS].includes(company.emailState)) return;
+
+  company.emailState = RequestState.PENDING;
 
   this.http.post<HttpResponse<any>>("/email",
     {
@@ -129,7 +156,7 @@ sendMail(company: Company) {
   .subscribe({
     next:(mailSentResponse: HttpResponse<any>)=>{
     if(mailSentResponse.status == HttpStatusCode.Created ) {
-      company.emailState = EmailState.SUCCESS;
+      company.emailState = RequestState.SUCCESS;
       this.companyDataService.updateEntry(company);
       this.snackbarService.showSuccessMessage(`The email for company ${company.companyParams.name} has been sent to ${company.selectedEmail}!`);
     } else {
@@ -145,8 +172,8 @@ sendMail(company: Company) {
 
 private handleMailFailure(company: Company, message: string) {
   this.snackbarService.showErrorMessage(message);
-  company.emailState = EmailState.FAILED;
-  company.emailState = EmailState.NOT_STARTED;
+  company.emailState = RequestState.FAILED;
+  company.emailState = RequestState.NOT_STARTED;
 }
 
   private applyFilter() {

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Company } from '../types/companies';
-import { lastValueFrom, map, Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { CompanyParams } from '../types/companyparams';
 import { LatLng } from 'leaflet';
 
@@ -22,7 +22,9 @@ export class CompanyDbService {
       "latitude": company.companyParams.location.lat,
       "longitude": company.companyParams.location.lng,
       "crawler_state": company.crawlerState.toString(),
-      "email_state": company.emailState.toString()
+      "email_state": company.emailState.toString(),
+      "analyze_state": company.analyzeState.toString(),
+      "benchmarks": company.benchmarks
   }));
   return this.http.post("/customerdb/companies/bulk", payloads);
 }
@@ -38,7 +40,9 @@ export class CompanyDbService {
       "latitude": company.companyParams.location.lat,
       "longitude": company.companyParams.location.lng,
       "crawler_state": company.crawlerState.toString(),
-      "email_state": company.emailState.toString()
+      "email_state": company.emailState.toString(),
+      "analyze_state": company.analyzeState.toString(),
+      "benchmarks": company.benchmarks
     })
   }
 
@@ -51,9 +55,9 @@ export class CompanyDbService {
           city: e.city,
           craft: e.craft,
           emails: e.emails,
-          website: e.websites
+          website: e.websites,
         };
-        return new Company(companyParams, e.id, e.email_state, e.crawler_state);
+        return new Company(companyParams, e.id, e.email_state, e.crawler_state, e.analyzeState, e.benchmarks);
       }))
     );
   }
@@ -69,7 +73,9 @@ export class CompanyDbService {
       "latitude": company.companyParams.location.lat,
       "longitude": company.companyParams.location.lng,
       "crawler_state": company.crawlerState.toString(),
-      "email_state": company.emailState.toString()
+      "email_state": company.emailState.toString(),
+      "analyze_state": company.analyzeState.toString(),
+      "benchmarks": company.benchmarks
     };
     return this.http.put(`/customerdb/companies/${company.id}`, payload);
   }
