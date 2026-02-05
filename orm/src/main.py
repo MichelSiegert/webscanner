@@ -1,5 +1,6 @@
 import os
 from database import get_db
+from benchmark import Benchmark
 from sqlalchemy.orm import Session
 from company import Company 
 from fastapi import FastAPI, Depends, HTTPException
@@ -47,13 +48,27 @@ def get_company(id: str, db: Session = Depends(get_db)):
 
 @app.put("/companies/{id}")
 def update_company(id: str, data: dict, db: Session = Depends(get_db)):
-    company_query = db.query(Company).filter(Company.id == id)
-    if not company_query.first():
-        raise HTTPException(status_code=404, detail="Not found")
+    company = db.query(Company).filter(Company.id == id).first()
     
-    company_query.update(data)
-    db.commit()
-    return {"message": "Updated successfully"}
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    benchmarks_data = data.pop('benchmarks', None)
+    for key, value in data.items():
+        if hasattr(company, key):
+            setattr(company, key, value)
+    
+    if benchmarks_data is not None:
+        company.benchmarks = [Benchmark(**b) for b in benchmarks_data]
+    
+    try:
+        db.commit()
+        db.refresh(company)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+        
+    return {"message": "Updated successfully", "id": company.id}
 
 @app.delete("/companies/{id}")
 def delete_company(id: str, db: Session = Depends(get_db)):
