@@ -125,7 +125,7 @@ analyzePage(company: Company) {
     })
   .subscribe({
     next:(mailSentResponse: HttpResponse<any>)=>{
-    if(mailSentResponse.status == HttpStatusCode.Created ) {
+    if(mailSentResponse.status == HttpStatusCode.Ok ) {
       company.analyzeState = RequestState.SUCCESS;
       this.companyDataService.updateEntry(company);
       this.snackbarService.showSuccessMessage(`Successfully analyzed ${company.companyParams.name} website ${company.selectedWebsite}!`);
