@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export class Benchmark {
+export class Requirements {
 
   constructor(
     public name: string,
@@ -8,6 +8,5 @@ export class Benchmark {
     public succeed: boolean = true,
     public timestamp : number= Date.now(),
     public id: string = uuidv4()
-
   ) { }
 }

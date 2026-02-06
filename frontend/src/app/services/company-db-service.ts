@@ -24,7 +24,7 @@ export class CompanyDbService {
       "crawler_state": company.crawlerState.toString(),
       "email_state": company.emailState.toString(),
       "analyze_state": company.analyzeState.toString(),
-      "benchmarks": company.benchmarks
+      "requirements": company.requirements
   }));
   return this.http.post("/customerdb/companies/bulk", payloads);
 }
@@ -42,7 +42,7 @@ export class CompanyDbService {
       "crawler_state": company.crawlerState.toString(),
       "email_state": company.emailState.toString(),
       "analyze_state": company.analyzeState.toString(),
-      "benchmarks": company.benchmarks
+      "requirements": company.requirements
     })
   }
 
@@ -75,8 +75,14 @@ export class CompanyDbService {
       "crawler_state": company.crawlerState.toString(),
       "email_state": company.emailState.toString(),
       "analyze_state": company.analyzeState.toString(),
-      "benchmarks": company.benchmarks
-    };
+      "requirements": company.requirements.map(req => ({
+        id: req.id,
+        name: req.name,
+        company_id: req.companyID,
+        succeed: req.succeed,
+        timestamp: req.timestamp
+        }))
+      };
     return this.http.put(`/customerdb/companies/${company.id}`, payload);
   }
 

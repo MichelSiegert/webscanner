@@ -1,6 +1,6 @@
 import os
 from database import get_db
-from benchmark import Benchmark
+from requirements import Requirements
 from sqlalchemy.orm import Session
 from company import Company 
 from fastapi import FastAPI, Depends, HTTPException
@@ -26,9 +26,9 @@ def create_company(data: dict, db: Session = Depends(get_db)):
 def bulk_create_companies(data: list[dict], db: Session = Depends(get_db)):
     company_objects = []
     for entry in data:
-        benchmarks_data = entry.pop('benchmarks', [])
+        requirements_data = entry.pop('requirements', [])
         company = Company(**entry)
-        company.benchmarks = [Benchmark(**b) for b in benchmarks_data]
+        company.requirements = [Requirements(**b) for b in requirements_data]
         company_objects.append(company)
     
     db.add_all(company_objects)
@@ -48,18 +48,19 @@ def get_company(id: str, db: Session = Depends(get_db)):
 
 @app.put("/companies/{id}")
 def update_company(id: str, data: dict, db: Session = Depends(get_db)):
-    company = db.query(Company).filter(Company.id == id).first()
     
+    company = db.query(Company).filter(Company.id == id).first()
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     
-    benchmarks_data = data.pop('benchmarks', None)
+    requirements_data = data.pop('requirements', None)
+
     for key, value in data.items():
         if hasattr(company, key):
             setattr(company, key, value)
     
-    if benchmarks_data is not None:
-        company.benchmarks = [Benchmark(**b) for b in benchmarks_data]
+    if requirements_data is not None:
+        company.requirements = [Requirements(**b) for b in requirements_data]
     
     try:
         db.commit()

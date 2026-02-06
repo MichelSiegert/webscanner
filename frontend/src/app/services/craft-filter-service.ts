@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { CompanyDataService } from './company-data-service';
 import { Company } from '../types/companies';
 
 @Injectable({

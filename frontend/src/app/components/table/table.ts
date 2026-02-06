@@ -11,6 +11,7 @@ import { Company } from '../../types/companies';
 import { CompanyDataService } from '../../services/company-data-service';
 import { SnackbarService } from '../../services/snackbar-service';
 import RequestState from '../../types/requestState';
+import { Requirements } from '../../types/Requirements';
 
 @Component({
   selector: 'app-table',
@@ -126,6 +127,11 @@ analyzePage(company: Company) {
   .subscribe({
     next:(mailSentResponse: HttpResponse<any>)=>{
     if(mailSentResponse.status == HttpStatusCode.Ok ) {
+      const analysisResults = JSON.parse(mailSentResponse.body);
+      console.log(analysisResults);
+      company.requirements.push(...(analysisResults?.requirements ?? []).map((e:any)=>{
+        return new Requirements(e.name, e.url, e.succeed === "SUCCESS", e.timestamp);
+      }));
       company.analyzeState = RequestState.SUCCESS;
       this.companyDataService.updateEntry(company);
       this.snackbarService.showSuccessMessage(`Successfully analyzed ${company.companyParams.name} website ${company.selectedWebsite}!`);
