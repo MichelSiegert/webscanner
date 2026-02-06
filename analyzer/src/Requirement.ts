@@ -7,7 +7,7 @@ interface Requirement {
     succeed: RequirementStatus;
     timestamp: number;
 
-    evalutate(page: Page): Promise<RequirementStatus>;
+    evaluate(page: Page): Promise<RequirementStatus>;
 }
 
 export default Requirement;
