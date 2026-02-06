@@ -82,7 +82,7 @@ crawlPage(company: Company) {
   .subscribe({
     next: (result: any) => {
       if (!result?.websites?.length) {
-        this.handleCrawlerFailure(company, "No websites found for this company.");
+        this.handleFailure(company, "crawlerState", "No websites found for this company.");
         return;
       }
 
@@ -100,16 +100,9 @@ crawlPage(company: Company) {
     },
     error: (err: any) => {
       const errorMessage = err.error?.message || err.error?.error || "An unknown error occurred";
-      this.handleCrawlerFailure(company, errorMessage);
+      this.handleFailure(company, "crawlerState", errorMessage);
     }
   });
-}
-
-private handleCrawlerFailure(company: Company, message: string) {
-  company.crawlerState = RequestState.FAILED;
-  this.snackbarService.showErrorMessage(message);
-  company.crawlerState = RequestState.NOT_STARTED;
-  this.companyDataService.updateEntry(company);
 }
 
 analyzePage(company: Company) {
@@ -136,12 +129,12 @@ analyzePage(company: Company) {
       this.companyDataService.updateEntry(company);
       this.snackbarService.showSuccessMessage(`Successfully analyzed ${company.companyParams.name} website ${company.selectedWebsite}!`);
     } else {
-      this.handleMailFailure(company, `Unexpected status: ${mailSentResponse.status}`);      }
+      this.handleFailure(company, "analyzeState", `Unexpected status: ${mailSentResponse.status}`);
+    }
     },
     error: (err) => {
     const errorDetail = err.error?.detail || err.message || "Server error";
-      this.handleMailFailure(company, `Error: ${errorDetail}`);
-      this.companyDataService.updateEntry(company);
+      this.handleFailure(company, "analyzeState", `Error: ${errorDetail}`);
     }
 });
 }
@@ -166,20 +159,19 @@ sendMail(company: Company) {
       this.companyDataService.updateEntry(company);
       this.snackbarService.showSuccessMessage(`The email for company ${company.companyParams.name} has been sent to ${company.selectedEmail}!`);
     } else {
-      this.handleMailFailure(company, `Unexpected status: ${mailSentResponse.status}`);      }
+      this.handleFailure(company, "emailState", `Unexpected status: ${mailSentResponse.status}`);      }
     },
     error: (err) => {
     const errorDetail = err.error?.detail || err.message || "Server error";
-      this.handleMailFailure(company, `Error: ${errorDetail}`);
-      this.companyDataService.updateEntry(company);
+      this.handleFailure(company, "emailState", `Error: ${errorDetail}`);
     }
 });
 }
 
-private handleMailFailure(company: Company, message: string) {
+private handleFailure(company: Company, stateKey: keyof Company, message: string) {
   this.snackbarService.showErrorMessage(message);
-  company.emailState = RequestState.FAILED;
-  company.emailState = RequestState.NOT_STARTED;
+  (company[stateKey] as any) = RequestState.NOT_STARTED;
+  this.companyDataService.updateEntry(company);
 }
 
   private applyFilter() {
