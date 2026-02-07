@@ -1,4 +1,3 @@
-import * as chromeLauncher from 'chrome-launcher';
 import lighthouse from 'lighthouse';
 import { writeFileSync } from 'fs';
 import Requirement from '../types/Requirement.js';
