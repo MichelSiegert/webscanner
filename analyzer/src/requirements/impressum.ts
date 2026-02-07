@@ -1,6 +1,6 @@
 import { Page } from "puppeteer";
-import Requirement from "../Requirement.js";
-import RequirementStatus from "../RequirementStatus.js";
+import Requirement from "../types/Requirement.js";
+import RequirementStatus from "../types/RequirementStatus.js";
 import logger from "../logger.js";
 
 class ImpressumRequirement implements Requirement {

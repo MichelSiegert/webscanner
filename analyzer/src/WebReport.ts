@@ -1,12 +1,14 @@
-import Requirement from "./Requirement.js";
+import Requirement from "./types/Requirement.js";
 import ImpressumRequirement from "./requirements/impressum.js";
-import RequirementStatus from "./RequirementStatus.js";
+import RequirementStatus from "./types/RequirementStatus.js";
 import puppeteer from "puppeteer";
+import LighthouseRequirement from "./requirements/lighthouse.js";
 class WebReport {
     requirements: Requirement[] = [];
     
     constructor(public url: string, public timestamp = Date.now()){
         this.requirements.push(new ImpressumRequirement(this.url));
+        this.requirements.push(new LighthouseRequirement(this.url));
     }
 
     async executeReport(): Promise<void> {
