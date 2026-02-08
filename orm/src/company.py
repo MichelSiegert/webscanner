@@ -29,3 +29,4 @@ class Company(Base):
     email_state = Column(Enum(RequestState), default=RequestState.NOT_STARTED)
     analyze_state = Column(Enum(RequestState), default=RequestState.NOT_STARTED)
     requirements = relationship("Requirements", back_populates="company", cascade="all, delete-orphan")
+    

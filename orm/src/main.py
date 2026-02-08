@@ -35,8 +35,6 @@ def bulk_create_companies(data: list[dict], db: Session = Depends(get_db)):
     db.commit()
     return {"message": f"Created {len(data)} companies"}
 
-
-
 @app.get("/companies")
 def get_companies(db: Session = Depends(get_db)):
     return db.query(Company).options(joinedload(Company.requirements)).all()

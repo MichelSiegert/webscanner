@@ -22,9 +22,8 @@ app.get('/', async (req: Request, res: Response) => {
         return;
     }
     
-
     try {
-        const report: WebReport = new WebReport(url);
+        const report: WebReport = new WebReport(url, id);
         await report.executeReport();
         res.status(StatusCodes.OK).json(JSON.stringify(report));
     } catch(e:any) {

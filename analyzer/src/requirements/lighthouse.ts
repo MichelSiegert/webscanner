@@ -9,7 +9,7 @@ class LighthouseRequirement implements Requirement {
     succeed: RequirementStatus;
     timestamp: number;
 
-    constructor(url: string) {
+    constructor(url: string, public id: string) {
         this.url = url;
         this.succeed = RequirementStatus.PENDING;
         this.timestamp = Date.now();

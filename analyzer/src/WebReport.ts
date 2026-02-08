@@ -6,9 +6,9 @@ import LighthouseRequirement from "./requirements/lighthouse.js";
 class WebReport {
     requirements: Requirement[] = [];
     
-    constructor(public url: string, public timestamp = Date.now()){
+    constructor(public url: string, public id: string, public timestamp = Date.now()){
         this.requirements.push(new ImpressumRequirement(this.url));
-        this.requirements.push(new LighthouseRequirement(this.url));
+        this.requirements.push(new LighthouseRequirement(this.url, this.url));
     }
 
     async executeReport(): Promise<void> {
