@@ -1,5 +1,4 @@
-import lighthouse from 'lighthouse';
-import { writeFileSync } from 'fs';
+import lighthouse, { RunnerResult } from 'lighthouse';
 import Requirement from '../types/Requirement.js';
 import puppeteer, { Page } from 'puppeteer';
 import RequirementStatus from '../types/RequirementStatus.js';
@@ -18,6 +17,7 @@ class LighthouseRequirement implements Requirement {
 
     async evaluate(page: Page): Promise<RequirementStatus> {
         const score: number = await this.runLighthouse(this.url);
+        page.close();
         return score > 80? RequirementStatus.SUCCESS: RequirementStatus.FAILED;
     }
 
@@ -33,16 +33,31 @@ class LighthouseRequirement implements Requirement {
                 port: port,
           };
 
-          const runnerResult = await lighthouse(url, options);
-          const reportJson: string = runnerResult?.report.toString() ?? "";
-          const reportObject: any = runnerResult?.lhr;
-          if (reportJson) {
-                writeFileSync('lighthouse-report.json', reportJson);
-                console.log('Report saved to lighthouse-report.json');
+          const runnerResult: RunnerResult = (await lighthouse(url, options))!;
+          if (!runnerResult || !runnerResult.lhr) {
+            console.error("Lighthouse failed to produce a result object.");
+            return 0; 
+        }
 
-          }
-          console.log(reportObject);
-          console.log(`Performance score: ${reportObject?.categories.performance.score * 100}`);
+        if (!runnerResult.lhr.categories) {
+            console.error("Lighthouse ran, but categories are missing. Check for page errors.");
+            return 0;
+        }
+
+          const reportObject: any = runnerResult?.lhr;
+
+        const performanceScore = reportObject.categories?.performance?.score;
+        const accessibilityScore = reportObject.categories?.accessibility?.score;
+        const bestPracticesScore = reportObject.categories?.['best-practices']?.score;
+        const seoScore = reportObject.categories?.seo?.score;
+
+        const summary = {
+            performance: (performanceScore ?? 0) * 100,
+            accessibility: (accessibilityScore ?? 0) * 100,
+            bestPractices: (bestPracticesScore ?? 0) * 100,
+            seo: (seoScore ?? 0) * 100,
+        };
+          
           await browser.close();
           return (reportObject?.categories?.performance?.score ?? 0 ) * 100;
     }

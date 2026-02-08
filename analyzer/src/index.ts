@@ -9,11 +9,19 @@ const PORT: Number = +(process.env.PORT ?? 3000);
 
 app.get('/', async (req: Request, res: Response) => {
     const url: string = (req.query?.url ?? "") as string;
+    const id: string = (req.query?.id ?? "") as string;
     if(!url){
         logger.warn(`request had no URL.`);
         res.status(StatusCodes.BAD_REQUEST).send(ReasonPhrases.BAD_REQUEST);
         return;
     }
+    
+    if(!id){
+        logger.warn(`request had no ID.`);
+        res.status(StatusCodes.BAD_REQUEST).send(ReasonPhrases.BAD_REQUEST);
+        return;
+    }
+    
 
     try {
         const report: WebReport = new WebReport(url);

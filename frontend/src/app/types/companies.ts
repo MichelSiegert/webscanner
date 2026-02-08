@@ -9,11 +9,12 @@ export class Company {
 
   constructor(
     public companyParams: CompanyParams,
-    public id: string = uuidv4(),
     public emailState: RequestState = RequestState.NOT_STARTED,
     public crawlerState: RequestState = RequestState.NOT_STARTED,
     public analyzeState: RequestState = RequestState.NOT_STARTED,
     public requirements: Requirements[] = [],
+    public id: string = uuidv4(),
+
   ) {
     this.selectedEmail = companyParams.emails?.[0] || "";
     this.selectedWebsite = companyParams.website?.[0] || "";

@@ -41,7 +41,6 @@ app.get("/search", async (req, res) => {
         console.error(err);
         res.status(500).json({ error: "Failed to fetch search results" });
     }
-    console.log("done!");
 });
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
