@@ -47,7 +47,7 @@ export class CompanyDbService {
   }
 
   getCompanies(): Observable<Company[]> {
-    return this.http.get<any[]>("/customerdb/companies").pipe(
+    return this.http.get<any[]>("/customerdb/companies/").pipe(
       map((data) => data.map((e: any) => {
         const companyParams: CompanyParams = {
           location: new LatLng(e.latitude, e.longitude),
