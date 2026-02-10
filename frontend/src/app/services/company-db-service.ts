@@ -30,7 +30,7 @@ export class CompanyDbService {
 }
 
   createCompany(company: Company) {
-    return this.http.post("/customerdb/companies", {
+    return this.http.post("/customerdb/companies/", {
       "id": company.id,
       "name": company.companyParams.name ?? "",
       "craft": company.companyParams.craft ?? "",
