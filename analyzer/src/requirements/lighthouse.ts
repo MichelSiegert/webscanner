@@ -3,6 +3,7 @@ import Requirement from '../types/Requirement.js';
 import puppeteer, { Page } from 'puppeteer';
 import RequirementStatus from '../types/RequirementStatus.js';
 import { v4 as uuidv4 } from 'uuid';
+import logger from '../logger.js';
 
 class LighthouseRequirement implements Requirement {
     name: string = "";
@@ -17,6 +18,7 @@ class LighthouseRequirement implements Requirement {
     }
 
     async evaluate(page: Page): Promise<RequirementStatus> {
+        logger.info("starting lighthouse...");
         const score: number = await this.runLighthouse(this.url);
         page.close();
         return score > 80? RequirementStatus.SUCCESS: RequirementStatus.FAILED;
@@ -68,20 +70,18 @@ class LighthouseRequirement implements Requirement {
                 best_practices: summary.bestPractices,
                 seo: summary.seo
             }
-            console.log(lighthouse);
-            const a =  await fetch("http://webscanner-orm:2000/lighthouse/",{
+            await fetch("http://webscanner-orm:2000/lighthouse/",{
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(lighthouse)
         });
-        const b =  await a.json();
-        console.log(b);
 
         } catch(e: any){
-            console.log(e);
+            logger.error("Failing to save Lighthouse data to db. "+ e.message);
         }
           
           await browser.close();
+          logger.info("Lighthose requirement check finished for url "+ this.url)
           return (reportObject?.categories?.performance?.score ?? 0 ) * 100;
     }
 }
