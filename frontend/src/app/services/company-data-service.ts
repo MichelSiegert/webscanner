@@ -59,7 +59,7 @@ export class CompanyDataService {
   public updateEntry(updatedCompany: Company){
     const updatedList = this.dataSource.value.map((c: Company) =>
       {
-        const isMatch = c.companyParams.name === updatedCompany.companyParams.name;
+        const isMatch = c.id === updatedCompany.id;
         return isMatch ? updatedCompany : c;}
     );
     this.companyDbService.updateCompany(updatedCompany).subscribe((e)=>{console.log(e)});
