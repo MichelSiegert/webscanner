@@ -8,7 +8,7 @@ class WebReport {
     
     constructor(public url: string, public id: string, public timestamp = Date.now()){
         this.requirements.push(new ImpressumRequirement(this.url));
-        this.requirements.push(new LighthouseRequirement(this.url, this.url));
+        this.requirements.push(new LighthouseRequirement(this.url, this.id));
     }
 
     async executeReport(): Promise<void> {
