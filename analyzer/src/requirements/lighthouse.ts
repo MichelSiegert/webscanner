@@ -2,6 +2,7 @@ import lighthouse, { RunnerResult } from 'lighthouse';
 import Requirement from '../types/Requirement.js';
 import puppeteer, { Page } from 'puppeteer';
 import RequirementStatus from '../types/RequirementStatus.js';
+import { v4 as uuidv4 } from 'uuid';
 
 class LighthouseRequirement implements Requirement {
     name: string = "";
@@ -57,6 +58,28 @@ class LighthouseRequirement implements Requirement {
             bestPractices: (bestPracticesScore ?? 0) * 100,
             seo: (seoScore ?? 0) * 100,
         };
+        try{
+            const lighthouse = {
+                id: uuidv4(),
+                company_id: this.id,
+                timestamp: Math.floor(Date.now() / 1000),
+                performance:summary.performance,
+                accessibility: summary.accessibility,
+                best_practices: summary.bestPractices,
+                seo: summary.seo
+            }
+            console.log(lighthouse);
+            const a =  await fetch("http://webscanner-orm:2000/lighthouse/",{
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(lighthouse)
+        });
+        const b =  await a.json();
+        console.log(b);
+
+        } catch(e: any){
+            console.log(e);
+        }
           
           await browser.close();
           return (reportObject?.categories?.performance?.score ?? 0 ) * 100;

@@ -1,6 +1,7 @@
 import os
 from database import engine, Base
 from company import Company 
+from lighthouse import Lighthouse
 
 def setup():
     print("Checking/Creating tables...")
