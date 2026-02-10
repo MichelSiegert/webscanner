@@ -135,7 +135,18 @@
                 disabled:border-gray-300
                 disabled:cursor-not-allowed"
         >
-          Analyze Website
+        @if (company.analyzeState   === RequestState.PENDING) {
+          <div class="px-5">
+
+            <mat-progress-spinner
+              diameter="20"
+              mode="indeterminate"
+              color="white">
+            </mat-progress-spinner>
+          </div>
+          } @else {
+            Analyze Website
+          }
         </button>
         <button
           (click)="sendMail(company)"
