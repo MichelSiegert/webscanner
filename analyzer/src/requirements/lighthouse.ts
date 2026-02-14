@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import logger from '../logger.js';
 
 class LighthouseRequirement implements Requirement {
-    name: string = "";
+    name: string = "BestPracticeChecks";
     url: string;
     succeed: RequirementStatus;
     timestamp: number;
@@ -21,7 +21,8 @@ class LighthouseRequirement implements Requirement {
         logger.info("starting lighthouse...");
         const score: number = await this.runLighthouse(this.url);
         page.close();
-        return score > 80? RequirementStatus.SUCCESS: RequirementStatus.FAILED;
+        this.succeed = score > 80? RequirementStatus.SUCCESS: RequirementStatus.FAILED;
+        return this.succeed;
     }
 
     private async runLighthouse(url: string) {
