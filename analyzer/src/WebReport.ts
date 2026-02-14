@@ -3,12 +3,14 @@ import ImpressumRequirement from "./requirements/impressum.js";
 import RequirementStatus from "./types/RequirementStatus.js";
 import puppeteer from "puppeteer";
 import LighthouseRequirement from "./requirements/lighthouse.js";
+import HttpsRequirement from "./requirements/https.js";
 class WebReport {
     requirements: Requirement[] = [];
     
     constructor(public url: string, public id: string, public timestamp = Date.now()){
         this.requirements.push(new ImpressumRequirement(this.url));
         this.requirements.push(new LighthouseRequirement(this.url, this.id));
+        this.requirements.push(new HttpsRequirement(this.url));
     }
 
     async executeReport(): Promise<void> {
