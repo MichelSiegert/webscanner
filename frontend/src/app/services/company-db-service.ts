@@ -57,7 +57,7 @@ export class CompanyDbService {
           emails: e.emails,
           website: e.websites,
         };
-        return new Company(companyParams, e.email_state, e.crawler_state, e.analyzeState, e.benchmarks, e.id);
+        return new Company(companyParams, e.email_state, e.crawler_state, e.analyze_state, e.benchmarks, e.id);
       }))
     );
   }
