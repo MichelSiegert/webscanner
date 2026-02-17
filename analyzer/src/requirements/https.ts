@@ -3,6 +3,7 @@ import Requirement from "../types/Requirement.js";
 import RequirementStatus from "../types/RequirementStatus.js";
 import https from 'https';
 import { IncomingMessage } from "http";
+import logger from "../logger.js";
 
 class HttpsRequirement implements Requirement {
     name: string ="HttpsCheck";
@@ -17,6 +18,8 @@ class HttpsRequirement implements Requirement {
     }
 
     async evaluate(_page: Page): Promise<RequirementStatus> {
+        this.timestamp = Date.now();
+        try{
         return new Promise((resolve) => {
         const options = {
             method: 'GET',
@@ -52,7 +55,11 @@ class HttpsRequirement implements Requirement {
 
         req.end();
     });
-
+    } catch(e:any){
+        logger.error(e.message);
+        this.succeed = RequirementStatus.FAILED;
+        return this.succeed
+    }
 }
 }
 export default HttpsRequirement;

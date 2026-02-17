@@ -18,6 +18,8 @@ class LighthouseRequirement implements Requirement {
     }
 
     async evaluate(page: Page): Promise<RequirementStatus> {
+        this.timestamp = Date.now();
+
         logger.info("starting lighthouse...");
         const score: number = await this.runLighthouse(this.url);
         page.close();

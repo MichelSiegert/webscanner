@@ -16,6 +16,7 @@ class ImpressumRequirement implements Requirement {
     }
 
     async evaluate(page: Page): Promise<RequirementStatus> {
+        this.timestamp = Date.now();
         try {
             logger.info(`Starting Impressum check: ${this.url}`);
 
