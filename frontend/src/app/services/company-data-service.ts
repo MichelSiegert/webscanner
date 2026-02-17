@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, filter, map, switchMap, take, tap } from 'rxjs';
 import { Company } from '../types/companies';
 import { OverpassService } from './overpass-service';
 import { CompanyMapperService } from './company-mapper-service';
@@ -26,21 +26,24 @@ export class CompanyDataService {
     }
 
     public fetchCompanies(lat: number, lng: number): void {
-        this.overpassService.getNearbyCompanies(lat, lng).subscribe((places: any) => {
+        this.overpassService.getNearbyCompanies(lat, lng).pipe(
+          map((places: any)=>{
             const currentCompanies = this.dataSource.value;
-
-            const newCompanies = places.elements
+            return places.elements
                 .filter((p: any) => p.lat && p.lon && !this.exists(p?.tags?.name ?? "", currentCompanies))
-                .map((p: any) => {
-                  const c: Company = this.mapper.parseCompanyFromJSON(p)
-                  return c;
-                });
-            this.companyDbService.bulkCreateCompanies(newCompanies).subscribe((e: any)=>{console.log(e);});
+                .map((p: any) => this.mapper.parseCompanyFromJSON(p));
+          }),
 
-            if (newCompanies.length > 0) {
-                this.dataSource.next([...currentCompanies, ...newCompanies]);
-            }
-        });
+          filter(newCompanies => newCompanies.length > 0),
+
+          tap(newCompanies => {
+            const current = this.dataSource.value;
+            this.dataSource.next([...current, ...newCompanies]);
+          }),
+          switchMap(newCompanies => this.companyDbService.bulkCreateCompanies(newCompanies)),
+          take(1)
+
+        ).subscribe()
     }
 
     private exists(name: string, list: Company[]): boolean {
