@@ -59,13 +59,21 @@ export class CompanyDataService {
     this.dataSource.next(updatedList);
 }
 
-  public updateEntry(updatedCompany: Company){
-    const updatedList = this.dataSource.value.map((c: Company) =>
-      {
-        const isMatch = c.id === updatedCompany.id;
-        return isMatch ? updatedCompany : c;}
-    );
-    this.companyDbService.updateCompany(updatedCompany).subscribe((e)=>{console.log(e)});
-    this.dataSource.next(updatedList)
-  }
+public updateEntry(updatedCompany: Company) {
+  const previousList = this.dataSource.value;
+
+  const updatedList = previousList.map(c =>
+    c.id === updatedCompany.id ? updatedCompany : c
+  );
+  this.dataSource.next(updatedList);
+
+  this.companyDbService.updateCompany(updatedCompany).pipe(
+    take(1)
+  ).subscribe({
+    error: (err) => {
+      console.error("Database sync failed, rolling back...", err);
+      this.dataSource.next(previousList);
+    }
+  });
+}
 }
