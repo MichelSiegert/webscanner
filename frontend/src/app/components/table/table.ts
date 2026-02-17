@@ -89,10 +89,10 @@ export class Table implements OnInit{
         company.crawlerState = RequestState.SUCCESS;
         const links = result.websites.map((r: any) => r.link).filter((link: any) => !!link);
 
-        company.companyParams.website = links;
+        company.companyParams.website = [... new Set([...(company.companyParams.website || []), ...links])]
         if(links.length) company.selectedWebsite = links[0];
 
-        company.companyParams.emails = result.emails || [];
+        company.companyParams.emails = [... new Set([...(company.companyParams.emails || []), ...(result.emails || [])])];
         if(company.companyParams.emails?.length) company.selectedEmail = company.companyParams.emails[0];
 
         this.snackbarService.showSuccessMessage(`Crawler finished for ${company.companyParams.name}`);
