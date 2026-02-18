@@ -1,1 +1,27 @@
-<p>header works!</p>
+<nav class="bg-slate-900 text-white shadow-lg">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex-shrink-0 flex items-center gap-2">
+        <span class="material-icons text-blue-400">explore</span>
+        <span class="font-bold text-xl tracking-tight">BranchenScanner</span>
+      </div>
+
+      <div class="flex space-x-4">
+        <a
+          routerLink="/"
+          routerLinkActive="bg-slate-800 text-blue-400"
+          [routerLinkActiveOptions]="{exact: true}"
+          class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition-colors">
+          Map View
+        </a>
+        <a
+          routerLink="/search"
+          routerLinkActive="bg-slate-800 text-blue-400"
+          class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition-colors">
+          Search
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
