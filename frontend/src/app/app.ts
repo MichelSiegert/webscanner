@@ -1,23 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { MapComponent } from './components/map/map';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { FormsModule } from '@angular/forms';
-import { Table } from './components/table/table';
-import { Branches } from "./components/branches/branches";
+import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'app-root',
-  imports: [MapComponent,
-    MatSlideToggleModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatInputModule,
-    Table,
-    FormsModule,
-    Branches],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
   providers:[]
