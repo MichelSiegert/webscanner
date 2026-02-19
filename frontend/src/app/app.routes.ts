@@ -1,8 +1,8 @@
 import {Routes} from '@angular/router';
 import { MainLayout } from './components/main-layout/main-layout';
-import { MapComponent } from './components/map/map';
 import { MapLayout } from './components/map-layout/map-layout';
 import { SearchLayout } from './components/search-layout/search-layout';
+import { Impressum } from './components/impressum/impressum';
 export const routes: Routes = [
   {
     path: '',
@@ -15,6 +15,10 @@ export const routes: Routes = [
       path: "search",
       component: SearchLayout
     },
+    {
+      path: "impressum",
+      component: Impressum
+    }
 
   ]
   }
