@@ -17,7 +17,7 @@ This Project uses following services(names are subject to change):
 - ORM: object relational mapper, implemented in Python using sqlAlchemy
 - Postgres: as a db
 - Keycloak: for Auth (or rather in progress)
-
+- Analyzer: checks websites if they fulfill certain static requirements (Benchmarks)
 For deployments I use a combination of Helm and skaffold to make deploying and testing easier.
 
 ## Setup
